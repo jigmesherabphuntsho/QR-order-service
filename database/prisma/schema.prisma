@@ -1,0 +1,93 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../backend/node_modules/.prisma/client"
+}
+
+model Restaurant {
+  id           String   @id @default(uuid())
+  name         String   @default("Gourmet Haven")
+  tagline      String   @default("Authentic Flavors & Fresh Ingredients")
+  openingHours String   @default("10:00 AM - 10:00 PM")
+  phone        String   @default("+1 (555) 234-5678")
+  email        String   @default("info@gourmethaven.com")
+  address      String   @default("123 Culinary St, Foodville")
+  currency     String   @default("$")
+  tableCount   Int      @default(12)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Admin {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      String   @default("ADMIN")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Table {
+  id         String   @id @default(uuid())
+  number     Int      @unique
+  qrCodeUrl  String?
+  isOccupied Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Category {
+  id          String     @id @default(uuid())
+  name        String
+  slug        String     @unique
+  description String?
+  sortOrder   Int        @default(0)
+  items       MenuItem[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model MenuItem {
+  id             String      @id @default(uuid())
+  name           String
+  description    String
+  price          Float
+  imageUrl       String
+  categoryId     String
+  category       Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  isAvailable    Boolean     @default(true)
+  isTodaySpecial Boolean     @default(true)
+  sortOrder      Int         @default(0)
+  orderItems     OrderItem[]
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+}
+
+model Order {
+  id           String      @id @default(uuid())
+  orderNumber  Int         @unique
+  tableNumber  Int
+  customerName String?     @default("Guest")
+  totalAmount  Float
+  status       String      @default("PENDING")
+  notes        String?
+  items        OrderItem[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model OrderItem {
+  id         String   @id @default(uuid())
+  orderId    String
+  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItemId String
+  menuItem   MenuItem @relation(fields: [menuItemId], references: [id])
+  quantity   Int
+  price      Float
+  notes      String?
+}
