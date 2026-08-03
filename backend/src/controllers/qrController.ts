@@ -42,7 +42,7 @@ export const getTables = async (req: Request, res: Response) => {
 
     // Attach dynamic QR Data URL to each table object
     const tablesWithQR = await Promise.all(
-      tables.map(async (t) => {
+      tables.map(async (t: any) => {
         const qrContent = `${clientUrl}/menu?table=${t.number}`;
         const dataUrl = await QRCode.toDataURL(qrContent, {
           width: 300,
