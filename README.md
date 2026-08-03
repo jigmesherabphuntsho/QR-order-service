@@ -152,8 +152,7 @@ Resturent Order/
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/restaurant-qr-ordering.git
-cd restaurant-qr-ordering
+git clone https://github.com/Diwas03/QR-order-service.git
 ```
 
 ### 2. Install Dependencies
