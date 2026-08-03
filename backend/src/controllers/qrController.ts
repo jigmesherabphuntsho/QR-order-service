@@ -2,79 +2,30 @@ import { Request, Response } from 'express';
 import QRCode from 'qrcode';
 import { prisma } from '../config/db.js';
 
-import os from 'os';
-
-export const getSystemNetworkIp = (): string => {
-  const interfaces = os.networkInterfaces();
-  for (const name of Object.keys(interfaces)) {
-    for (const iface of interfaces[name] || []) {
-      if (iface.family === 'IPv4' && !iface.internal) {
-        return iface.address;
-      }
-    }
+const getClientUrl = (req: Request): string => {
+  const queryBaseUrl = req.query.baseUrl as string;
+  if (queryBaseUrl && typeof queryBaseUrl === 'string' && queryBaseUrl.trim() !== '') {
+    return queryBaseUrl.trim().replace(/\/+$/, '');
   }
-  return 'localhost';
-};
-
-const resolveBaseUrl = (req: Request): string => {
-  const queryBase = req.query.baseUrl as string;
-  const bodyBase = req.body?.baseUrl as string;
-  const passedBase = queryBase || bodyBase;
-  if (passedBase && /^https?:\/\//i.test(passedBase.trim())) {
-    return passedBase.trim().replace(/\/+$/, '');
+  const origin = req.headers.origin;
+  if (origin && typeof origin === 'string' && origin.trim() !== '') {
+    return origin.trim().replace(/\/+$/, '');
   }
-
-  const systemIp = getSystemNetworkIp();
-  let baseCandidate = '';
-
-  const origin = req.headers.origin || req.headers.referer;
-  if (origin && typeof origin === 'string') {
+  const referer = req.headers.referer;
+  if (referer && typeof referer === 'string') {
     try {
-      const parsed = new URL(origin);
-      baseCandidate = `${parsed.protocol}//${parsed.host}`;
+      const url = new URL(referer);
+      return url.origin;
     } catch {
-      // Fallthrough
+      // Fall through
     }
   }
-
-  if (!baseCandidate) {
-    const host = req.headers['x-forwarded-host'] || req.headers.host;
-    if (host && typeof host === 'string') {
-      const proto = req.headers['x-forwarded-proto'] || req.protocol || 'http';
-      baseCandidate = `${proto}://${host}`;
-    }
-  }
-
-  if (!baseCandidate) {
-    baseCandidate = process.env.CLIENT_URL || 'http://localhost:3000';
-  }
-
-  // Automatically replace localhost / 127.0.0.1 with real LAN IP for mobile QR scanning
-  if (systemIp !== 'localhost') {
-    baseCandidate = baseCandidate.replace(/localhost|127\.0\.0\.1/gi, systemIp);
-  }
-
-  return baseCandidate.replace(/\/+$/, '');
-};
-
-const buildQrTargetUrl = (clientUrl: string, tableNumber: number, customUrl?: string | null) => {
-  const trimmed = customUrl?.trim();
-  if (trimmed) {
-    if (/^https?:\/\//i.test(trimmed)) {
-      return trimmed;
-    }
-    if (trimmed.startsWith('/')) {
-      return `${clientUrl}${trimmed}`;
-    }
-    return `${clientUrl}/${trimmed.replace(/^\/+/, '')}`;
-  }
-
-  return `${clientUrl}/menu?table=${tableNumber}`;
+  return (process.env.CLIENT_URL || 'http://localhost:3000').replace(/\/+$/, '');
 };
 
 export const getTables = async (req: Request, res: Response) => {
   try {
-    const clientUrl = resolveBaseUrl(req);
+    const clientUrl = getClientUrl(req);
     let tables = await prisma.table.findMany({
       orderBy: { number: 'asc' },
     });
@@ -92,8 +43,7 @@ export const getTables = async (req: Request, res: Response) => {
     // Attach dynamic QR Data URL to each table object
     const tablesWithQR = await Promise.all(
       tables.map(async (t: any) => {
-        const qrContent = buildQrTargetUrl(clientUrl, t.number, t.qrCodeUrl);
-
+        const qrContent = `${clientUrl}/menu?table=${t.number}`;
         const dataUrl = await QRCode.toDataURL(qrContent, {
           width: 300,
           margin: 2,
@@ -104,7 +54,7 @@ export const getTables = async (req: Request, res: Response) => {
         });
         return {
           ...t,
-          qrUrl: qrContent,
+          qrUrl: `${clientUrl}/menu?table=${t.number}`,
           qrDataUrl: dataUrl,
         };
       })
@@ -119,14 +69,14 @@ export const getTables = async (req: Request, res: Response) => {
 export const generateTableQR = async (req: Request, res: Response) => {
   try {
     const { tableNumber } = req.params;
-    const clientUrl = resolveBaseUrl(req);
-    const table = await prisma.table.findFirst({ where: { number: parseInt(tableNumber) } });
+    const clientUrl = getClientUrl(req);
+    const num = parseInt(tableNumber, 10);
 
-    if (!table) {
-      return res.status(404).json({ success: false, message: 'Table not found' });
+    if (isNaN(num) || num <= 0) {
+      return res.status(400).json({ success: false, message: 'Invalid table number' });
     }
 
-    const qrContent = buildQrTargetUrl(clientUrl, table.number, table.qrCodeUrl);
+    const qrContent = `${clientUrl}/menu?table=${num}`;
 
     const dataUrl = await QRCode.toDataURL(qrContent, {
       width: 400,
@@ -139,47 +89,7 @@ export const generateTableQR = async (req: Request, res: Response) => {
 
     return res.json({
       success: true,
-      tableNumber: table.number,
-      url: qrContent,
-      qrDataUrl: dataUrl,
-    });
-  } catch (error: any) {
-    return res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-export const updateTableQR = async (req: Request, res: Response) => {
-  try {
-    const { tableNumber } = req.params;
-    const clientUrl = resolveBaseUrl(req);
-    const rawUrl = req.body?.url;
-    const customUrl = typeof rawUrl === 'string' ? rawUrl.trim() : '';
-
-    const table = await prisma.table.findFirst({ where: { number: parseInt(tableNumber) } });
-    if (!table) {
-      return res.status(404).json({ success: false, message: 'Table not found' });
-    }
-
-    const updatedTable = await prisma.table.update({
-      where: { id: table.id },
-      data: {
-        qrCodeUrl: customUrl || null,
-      },
-    });
-
-    const qrContent = buildQrTargetUrl(clientUrl, updatedTable.number, updatedTable.qrCodeUrl);
-    const dataUrl = await QRCode.toDataURL(qrContent, {
-      width: 400,
-      margin: 2,
-      color: {
-        dark: '#0f172a',
-        light: '#ffffff',
-      },
-    });
-
-    return res.json({
-      success: true,
-      tableNumber: updatedTable.number,
+      tableNumber: num,
       url: qrContent,
       qrDataUrl: dataUrl,
     });
@@ -190,14 +100,18 @@ export const updateTableQR = async (req: Request, res: Response) => {
 
 export const createTable = async (req: Request, res: Response) => {
   try {
-    const { number, qrCodeUrl } = req.body;
-    const tableNumber = parseInt(number);
+    const { number } = req.body;
+    const tableNumber = parseInt(number, 10);
 
     if (isNaN(tableNumber) || tableNumber <= 0) {
-      return res.status(400).json({ success: false, message: 'Please provide a valid positive table number' });
+      return res.status(400).json({ success: false, message: 'Please provide a valid table number greater than 0' });
     }
 
-    const existing = await prisma.table.findFirst({ where: { number: tableNumber } });
+    // Check if table already exists
+    const existing = await prisma.table.findUnique({
+      where: { number: tableNumber },
+    });
+
     if (existing) {
       return res.status(400).json({ success: false, message: `Table #${tableNumber} already exists` });
     }
@@ -205,30 +119,33 @@ export const createTable = async (req: Request, res: Response) => {
     const newTable = await prisma.table.create({
       data: {
         number: tableNumber,
-        qrCodeUrl: typeof qrCodeUrl === 'string' ? qrCodeUrl.trim() : null,
         isOccupied: false,
       },
     });
 
-    // Also update restaurant tableCount if needed
+    // Update restaurant tableCount if larger
     const restaurant = await prisma.restaurant.findFirst();
-    if (restaurant && newTable.number > restaurant.tableCount) {
+    if (restaurant && tableNumber > restaurant.tableCount) {
       await prisma.restaurant.update({
         where: { id: restaurant.id },
-        data: { tableCount: newTable.number },
+        data: { tableCount: tableNumber },
       });
     }
 
-    const clientUrl = resolveBaseUrl(req);
-    const qrContent = buildQrTargetUrl(clientUrl, newTable.number, newTable.qrCodeUrl);
+    const clientUrl = getClientUrl(req);
+    const qrContent = `${clientUrl}/menu?table=${newTable.number}`;
     const dataUrl = await QRCode.toDataURL(qrContent, {
-      width: 400,
+      width: 300,
       margin: 2,
-      color: { dark: '#0f172a', light: '#ffffff' },
+      color: {
+        dark: '#1e293b',
+        light: '#ffffff',
+      },
     });
 
     return res.status(201).json({
       success: true,
+      message: `Table #${tableNumber} created successfully`,
       table: {
         ...newTable,
         qrUrl: qrContent,
@@ -242,28 +159,26 @@ export const createTable = async (req: Request, res: Response) => {
 
 export const deleteTable = async (req: Request, res: Response) => {
   try {
-    const { tableNumber } = req.params;
-    const num = parseInt(tableNumber);
+    const { id } = req.params;
 
-    const table = await prisma.table.findFirst({ where: { number: num } });
-    if (!table) {
-      return res.status(404).json({ success: false, message: `Table #${tableNumber} not found` });
+    const existing = await prisma.table.findUnique({
+      where: { id },
+    });
+
+    if (!existing) {
+      return res.status(404).json({ success: false, message: 'Table not found' });
     }
 
-    await prisma.table.delete({ where: { id: table.id } });
+    await prisma.table.delete({
+      where: { id },
+    });
 
-    return res.json({ success: true, message: `Table #${num} deleted successfully`, tableNumber: num });
+    return res.json({
+      success: true,
+      message: `Table #${existing.number} deleted successfully`,
+    });
   } catch (error: any) {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
 
-export const getNetworkInfo = async (req: Request, res: Response) => {
-  const ip = getSystemNetworkIp();
-  const port = process.env.PORT || '3000';
-  return res.json({
-    success: true,
-    ip,
-    networkUrl: `http://${ip}:${port}`,
-  });
-};
