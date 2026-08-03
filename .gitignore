@@ -1,1 +1,8 @@
-node_modules
+node_modules/
+.env
+backend/.env
+*.env
+*.db
+*.db-journal
+dist/
+.DS_Store
