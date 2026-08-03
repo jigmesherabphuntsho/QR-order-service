@@ -153,12 +153,28 @@ export const api = {
   },
 
   // QR & Tables
-  getTables: async () => {
-    return request<{ success: boolean; count: number; tables: TableInfo[] }>('/qr/tables', {
+  getTables: async (baseUrl?: string) => {
+    const query = baseUrl ? `?baseUrl=${encodeURIComponent(baseUrl)}` : '';
+    return request<{ success: boolean; count: number; tables: TableInfo[] }>(`/qr/tables${query}`, {
       headers: getHeaders(true),
     });
   },
-  generateTableQR: async (tableNumber: number) => {
-    return request<{ success: boolean; tableNumber: number; url: string; qrDataUrl: string }>(`/qr/table/${tableNumber}`);
+  generateTableQR: async (tableNumber: number, baseUrl?: string) => {
+    const query = baseUrl ? `?baseUrl=${encodeURIComponent(baseUrl)}` : '';
+    return request<{ success: boolean; tableNumber: number; url: string; qrDataUrl: string }>(`/qr/table/${tableNumber}${query}`);
+  },
+  createTable: async (number: number) => {
+    return request<{ success: boolean; message: string; table: TableInfo }>('/qr/tables', {
+      method: 'POST',
+      headers: getHeaders(true),
+      body: JSON.stringify({ number }),
+    });
+  },
+  deleteTable: async (id: string) => {
+    return request<{ success: boolean; message: string }>(`/qr/tables/${id}`, {
+      method: 'DELETE',
+      headers: getHeaders(true),
+    });
   },
 };
+

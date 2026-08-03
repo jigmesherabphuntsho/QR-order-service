@@ -27,7 +27,14 @@ export const CartDrawer: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [tableInput, setTableInput] = useState<string>(tableNumber ? tableNumber.toString() : '1');
 
+  React.useEffect(() => {
+    if (tableNumber) {
+      setTableInput(tableNumber.toString());
+    }
+  }, [tableNumber]);
+
   if (!isCartOpen) return null;
+
 
   const handlePlaceOrder = async () => {
     const finalTable = parseInt(tableInput) || tableNumber || 1;
