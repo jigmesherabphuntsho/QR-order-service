@@ -31,6 +31,15 @@ export const TrackOrderPage: React.FC = () => {
 
   useEffect(() => {
     fetchOrderDetails();
+    if (!orderId) return;
+    const interval = setInterval(() => {
+      api.getOrderById(orderId)
+        .then((res) => {
+          if (res.success) setOrder(res.order);
+        })
+        .catch(console.error);
+    }, 5000);
+    return () => clearInterval(interval);
   }, [orderId]);
 
   // Socket Live Subscription

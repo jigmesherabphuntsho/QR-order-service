@@ -29,6 +29,14 @@ export const AdminOrdersPage: React.FC = () => {
 
   useEffect(() => {
     fetchOrders();
+    const interval = setInterval(() => {
+      api.getOrders({ status: selectedStatus })
+        .then((res) => {
+          if (res.success) setOrders(res.orders);
+        })
+        .catch(console.error);
+    }, 5000);
+    return () => clearInterval(interval);
   }, [selectedStatus]);
 
   // Real-time Socket Listener for New Incoming Orders
