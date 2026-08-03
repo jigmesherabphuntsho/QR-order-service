@@ -21,8 +21,8 @@ export const getMenuItems = async (req: Request, res: Response) => {
 
     if (search && typeof search === 'string') {
       where.OR = [
-        { name: { contains: search } },
-        { description: { contains: search } },
+        { name: { contains: search, mode: 'insensitive' } },
+        { description: { contains: search, mode: 'insensitive' } },
       ];
     }
 
