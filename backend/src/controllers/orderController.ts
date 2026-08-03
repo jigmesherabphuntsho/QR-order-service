@@ -212,12 +212,12 @@ export const getDashboardStats = async (req: Request, res: Response) => {
     });
 
     const totalRevenue = todayOrders
-      .filter((o) => o.status !== 'CANCELLED')
-      .reduce((sum, o) => sum + o.totalAmount, 0);
+      .filter((o: any) => o.status !== 'CANCELLED')
+      .reduce((sum: number, o: any) => sum + o.totalAmount, 0);
 
-    const pendingCount = todayOrders.filter((o) => o.status === 'PENDING').length;
-    const preparingCount = todayOrders.filter((o) => o.status === 'PREPARING').length;
-    const readyCount = todayOrders.filter((o) => o.status === 'READY').length;
+    const pendingCount = todayOrders.filter((o: any) => o.status === 'PENDING').length;
+    const preparingCount = todayOrders.filter((o: any) => o.status === 'PREPARING').length;
+    const readyCount = todayOrders.filter((o: any) => o.status === 'READY').length;
 
     const totalTables = await prisma.table.count();
     const occupiedTables = await prisma.table.count({ where: { isOccupied: true } });
