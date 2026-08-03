@@ -19,18 +19,23 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// API Health Check
-app.get('/api/health', (req, res) => {
+// Create API Router
+const apiRouter = express.Router();
+
+apiRouter.get('/health', (req, res) => {
   res.json({ status: 'ok', time: new Date().toISOString(), service: 'Restaurant QR API' });
 });
 
-// API Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/categories', categoryRoutes);
-app.use('/api/menu', menuRoutes);
-app.use('/api/orders', orderRoutes);
-app.use('/api/restaurant', restaurantRoutes);
-app.use('/api/qr', qrRoutes);
+apiRouter.use('/auth', authRoutes);
+apiRouter.use('/categories', categoryRoutes);
+apiRouter.use('/menu', menuRoutes);
+apiRouter.use('/orders', orderRoutes);
+apiRouter.use('/restaurant', restaurantRoutes);
+apiRouter.use('/qr', qrRoutes);
+
+// Mount router under BOTH /api AND / for 100% compatibility on local & Vercel
+app.use('/api', apiRouter);
+app.use('/', apiRouter);
 
 // Error Handling Middleware
 app.use(errorHandler);
