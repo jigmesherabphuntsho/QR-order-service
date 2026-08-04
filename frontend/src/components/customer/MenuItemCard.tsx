@@ -67,21 +67,21 @@ export const MenuItemCard: React.FC<MenuItemCardProps> = ({ item, onItemClick, c
       </div>
 
       {/* Content */}
-      <div className="p-4 flex-1 flex flex-col justify-between">
+      <div className="p-3 sm:p-4 flex-1 flex flex-col justify-between">
         <div>
-          <h3 className="font-bold text-base text-slate-900 dark:text-white line-clamp-1 group-hover:text-brand-500 transition-colors">
+          <h3 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white line-clamp-1 group-hover:text-brand-500 transition-colors">
             {item.name}
           </h3>
-          <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 mt-1 leading-relaxed">
+          <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 mt-1 leading-relaxed hidden sm:block">
             {item.description}
           </p>
         </div>
 
         {/* Price & Action */}
-        <div className="mt-4 flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800">
+        <div className="mt-3 sm:mt-4 flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800">
           <div>
-            <span className="text-xs text-slate-400 dark:text-slate-500 font-medium">Price</span>
-            <div className="text-lg font-extrabold text-slate-900 dark:text-white">
+            <span className="text-xs text-slate-400 dark:text-slate-500 font-medium hidden sm:block">Price</span>
+            <div className="text-sm sm:text-lg font-extrabold text-slate-900 dark:text-white">
               {currency}{item.price.toFixed(2)}
             </div>
           </div>
@@ -89,16 +89,16 @@ export const MenuItemCard: React.FC<MenuItemCardProps> = ({ item, onItemClick, c
           <button
             onClick={handleQuickAdd}
             disabled={!item.isAvailable}
-            className={`relative flex items-center justify-center gap-1 px-3 py-2 rounded-2xl text-xs font-bold transition-all ${
+            className={`relative flex items-center justify-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl text-xs font-bold transition-all ${
               item.isAvailable
                 ? 'bg-brand-500 hover:bg-brand-600 active:scale-95 text-white shadow-md shadow-brand-500/20'
                 : 'bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed'
             }`}
           >
-            <Plus className="w-4 h-4" />
-            <span>Add</span>
+            <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <span className="hidden sm:inline">Add</span>
             {currentQty > 0 && (
-              <span className="ml-1 px-1.5 py-0.5 rounded-full bg-white text-brand-600 font-black text-[10px]">
+              <span className="ml-0.5 sm:ml-1 px-1.5 py-0.5 rounded-full bg-white text-brand-600 font-black text-[10px]">
                 {currentQty}
               </span>
             )}

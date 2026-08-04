@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { QrCode, RefreshCw, Plus, Globe, Sparkles, Search, Trash2, CheckCircle, Link } from 'lucide-react';
 import { TableInfo, Restaurant } from '../../types';
 import { api } from '../../services/api';
-import { AdminSidebar } from '../../components/admin/AdminSidebar';
+import { AdminLayout } from '../../components/admin/AdminLayout';
 import { QrCard } from '../../components/admin/QrCard';
 import toast from 'react-hot-toast';
 
@@ -131,14 +131,11 @@ export const AdminQrPage: React.FC = () => {
   });
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-slate-50 dark:bg-slate-950">
-      <AdminSidebar />
-
-      <main className="flex-1 p-4 sm:p-8 space-y-6 overflow-y-auto">
+    <AdminLayout>
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white font-serif">
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white font-serif">
               Dynamic Table QR Code Generator
             </h1>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
@@ -333,8 +330,7 @@ export const AdminQrPage: React.FC = () => {
             ))}
           </div>
         )}
-      </main>
-    </div>
+    </AdminLayout>
   );
 };
 

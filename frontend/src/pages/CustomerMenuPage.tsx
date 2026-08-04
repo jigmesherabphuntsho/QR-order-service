@@ -76,7 +76,7 @@ export const CustomerMenuPage: React.FC = () => {
     <div className="min-h-screen pb-24">
       
       {/* Restaurant Hero Banner */}
-      <section className="relative bg-gradient-to-br from-slate-900 via-slate-950 to-brand-950 text-white py-12 px-4 sm:px-6 overflow-hidden">
+      <section className="relative bg-gradient-to-br from-slate-900 via-slate-950 to-brand-950 text-white py-8 px-4 sm:py-12 sm:px-6 overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-brand-500/20 via-transparent to-transparent pointer-events-none" />
         
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
@@ -120,9 +120,9 @@ export const CustomerMenuPage: React.FC = () => {
       />
 
       {/* Menu Items Grid */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-6">
+      <main className="max-w-7xl mx-auto px-3 sm:px-6 pt-4 sm:pt-6">
         {isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
             {[...Array(8)].map((_, i) => (
               <div key={i} className="h-72 rounded-3xl bg-slate-200 dark:bg-slate-800 animate-pulse" />
             ))}
@@ -138,7 +138,7 @@ export const CustomerMenuPage: React.FC = () => {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
             {filteredItems.map((item) => (
               <MenuItemCard
                 key={item.id}

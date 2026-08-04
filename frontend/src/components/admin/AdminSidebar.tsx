@@ -21,7 +21,7 @@ export const AdminSidebar: React.FC = () => {
   ];
 
   return (
-    <aside className="w-full md:w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 p-4 flex flex-col justify-between shrink-0">
+    <aside className="w-full h-full md:min-h-screen bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 p-4 flex flex-col justify-between shrink-0">
       <div className="space-y-6">
         {/* Brand */}
         <div className="flex items-center gap-3 px-2 py-2">

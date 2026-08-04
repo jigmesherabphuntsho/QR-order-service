@@ -3,7 +3,7 @@ import { ChefHat, Radio, Filter, RefreshCw, Volume2 } from 'lucide-react';
 import { Order, OrderStatus } from '../../types';
 import { api } from '../../services/api';
 import { useSocket } from '../../context/SocketContext';
-import { AdminSidebar } from '../../components/admin/AdminSidebar';
+import { AdminLayout } from '../../components/admin/AdminLayout';
 import { KdsOrderCard } from '../../components/admin/KdsOrderCard';
 import toast from 'react-hot-toast';
 
@@ -116,16 +116,13 @@ export const AdminOrdersPage: React.FC = () => {
   const statuses = ['ALL', 'PENDING', 'PREPARING', 'READY', 'SERVED', 'CANCELLED'];
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-slate-50 dark:bg-slate-950">
-      <AdminSidebar />
-
-      <main className="flex-1 p-4 sm:p-8 space-y-6 overflow-y-auto">
+    <AdminLayout>
         
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-bold text-slate-900 dark:text-white font-serif">
+              <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white font-serif">
                 Live Kitchen Display System (KDS)
               </h1>
               <div className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 text-xs font-bold border border-emerald-500/30">
@@ -192,7 +189,6 @@ export const AdminOrdersPage: React.FC = () => {
             ))}
           </div>
         )}
-      </main>
-    </div>
+    </AdminLayout>
   );
 };

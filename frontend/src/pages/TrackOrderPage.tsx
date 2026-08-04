@@ -135,6 +135,9 @@ export const TrackOrderPage: React.FC = () => {
             <div className="text-sm font-bold text-slate-800 dark:text-slate-200">
               {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </div>
+            <div className="text-xs text-slate-400 mt-0.5">
+              {new Date(order.createdAt).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })}
+            </div>
           </div>
         </div>
 

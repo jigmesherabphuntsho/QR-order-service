@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Store, Save, Loader2 } from 'lucide-react';
 import { Restaurant } from '../../types';
 import { api } from '../../services/api';
-import { AdminSidebar } from '../../components/admin/AdminSidebar';
+import { AdminLayout } from '../../components/admin/AdminLayout';
 import toast from 'react-hot-toast';
 
 export const AdminSettingsPage: React.FC = () => {
@@ -65,12 +65,9 @@ export const AdminSettingsPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-slate-50 dark:bg-slate-950">
-      <AdminSidebar />
-
-      <main className="flex-1 p-4 sm:p-8 space-y-6 overflow-y-auto">
+    <AdminLayout>
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white font-serif">
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white font-serif">
             Restaurant Profile & Settings
           </h1>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
@@ -206,7 +203,6 @@ export const AdminSettingsPage: React.FC = () => {
             </div>
           </form>
         )}
-      </main>
-    </div>
+    </AdminLayout>
   );
 };
