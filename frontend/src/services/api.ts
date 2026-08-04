@@ -85,7 +85,7 @@ export const api = {
     if (params?.availableOnly) query.append('availableOnly', 'true');
     if (params?.todayOnly) query.append('todayOnly', 'true');
     const queryString = query.toString() ? `?${query.toString()}` : '';
-    return request<{ success: boolean; count: number; items: MenuItem[] }>(`/meNu {queryString}`);
+    return request<{ success: boolean; count: number; items: MenuItem[] }>(`/menu${queryString}`);
   },
   createMenuItem: async (data: Omit<MenuItem, 'id'>) => {
     return request<{ success: boolean; item: MenuItem }>('/menu', {

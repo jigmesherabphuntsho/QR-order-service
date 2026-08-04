@@ -96,7 +96,7 @@ export const TrackOrderPage: React.FC = () => {
 
   return (
     <div className="min-h-screen py-8 px-4 sm:px-6 max-w-2xl mx-auto space-y-6">
-
+      
       {/* Header Bar */}
       <div className="flex items-center justify-between">
         <Link
@@ -115,7 +115,7 @@ export const TrackOrderPage: React.FC = () => {
 
       {/* Main Status Tracker Card */}
       <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-xl space-y-6">
-
+        
         {/* Table & Order Header */}
         <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
           <div>
@@ -162,7 +162,7 @@ export const TrackOrderPage: React.FC = () => {
                   </span>
                 </div>
                 <span className="font-bold text-slate-900 dark:text-white">
-                  Nu {(item.price * item.quantity).toFixed(2)}
+                  Nu${(item.price * item.quantity).toFixed(2)}
                 </span>
               </div>
             ))}
@@ -170,7 +170,7 @@ export const TrackOrderPage: React.FC = () => {
 
           <div className="flex justify-between text-sm font-extrabold text-slate-900 dark:text-white pt-2 border-t border-slate-100 dark:border-slate-800">
             <span>Total Amount</span>
-            <span className="text-brand-500">Nu {order.totalAmount.toFixed(2)}</span>
+            <span className="text-brand-500">Nu${order.totalAmount.toFixed(2)}</span>
           </div>
         </div>
       </div>
