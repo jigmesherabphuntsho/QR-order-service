@@ -158,7 +158,8 @@ export const AdminDashboardPage: React.FC = () => {
                   <th className="pb-3">Customer</th>
                   <th className="pb-3">Total</th>
                   <th className="pb-3">Status</th>
-                  <th className="pb-3">Time</th>
+                  <th className="pb-3">Date</th>
+<th className="pb-3">Time</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
@@ -174,21 +175,16 @@ export const AdminDashboardPage: React.FC = () => {
                       </span>
                     </td>
 
-                    //Date and time display for the order creation time
-
                     <td className="py-3">
-                      <div className="flex flex-col">
-                        <span className="text-slate-700 dark:text-slate-300 font-medium">
-                          {new Date(order.createdAt).toLocaleDateString([], { year: 'numeric', month: 'short', day: 'numeric' })}
-                        </span>
-
-                        <span className="text-xs text-slate-400">
-                          {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                      </div>
+                      <span className="text-slate-700 dark:text-slate-300 font-medium">
+                        {new Date(order.createdAt).toLocaleDateString([], { year: 'numeric', month: 'short', day: 'numeric' })}
+                      </span>
                     </td>
-
-
+                    <td className="py-3">
+                      <span className="text-xs text-slate-400">
+                        {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    </td>
                   </tr>
                 ))}
               </tbody>
