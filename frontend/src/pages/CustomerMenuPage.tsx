@@ -144,7 +144,7 @@ export const CustomerMenuPage: React.FC = () => {
                 key={item.id}
                 item={item}
                 onItemClick={(item) => setSelectedItem(item)}
-                currency={restaurant?.currency || '$'}
+                currency={restaurant?.currency || 'Nu'}
               />
             ))}
           </div>
@@ -155,7 +155,7 @@ export const CustomerMenuPage: React.FC = () => {
       <ItemDetailModal
         item={selectedItem}
         onClose={() => setSelectedItem(null)}
-        currency={restaurant?.currency || '$'}
+        currency={restaurant?.currency || 'Nu'}
       />
 
       {/* Floating View Cart Sticky Bar */}

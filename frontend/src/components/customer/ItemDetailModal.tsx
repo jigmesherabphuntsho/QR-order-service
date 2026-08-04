@@ -9,7 +9,7 @@ interface ItemDetailModalProps {
   currency?: string;
 }
 
-export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({ item, onClose, currency = '$' }) => {
+export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({ item, onClose, currency = 'Nu' }) => {
   if (!item) return null;
 
   const { addToCart, setIsCartOpen } = useCart();

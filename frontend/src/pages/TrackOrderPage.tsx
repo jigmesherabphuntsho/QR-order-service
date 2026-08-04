@@ -162,7 +162,7 @@ export const TrackOrderPage: React.FC = () => {
                   </span>
                 </div>
                 <span className="font-bold text-slate-900 dark:text-white">
-                  ${(item.price * item.quantity).toFixed(2)}
+                  Nu${(item.price * item.quantity).toFixed(2)}
                 </span>
               </div>
             ))}
@@ -170,7 +170,7 @@ export const TrackOrderPage: React.FC = () => {
 
           <div className="flex justify-between text-sm font-extrabold text-slate-900 dark:text-white pt-2 border-t border-slate-100 dark:border-slate-800">
             <span>Total Amount</span>
-            <span className="text-brand-500">${order.totalAmount.toFixed(2)}</span>
+            <span className="text-brand-500">Nu${order.totalAmount.toFixed(2)}</span>
           </div>
         </div>
       </div>

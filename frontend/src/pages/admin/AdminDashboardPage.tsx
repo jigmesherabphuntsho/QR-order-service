@@ -62,7 +62,7 @@ export const AdminDashboardPage: React.FC = () => {
             </div>
           </div>
           <div className="text-lg sm:text-2xl font-extrabold text-slate-900 dark:text-white">
-            ${stats?.todayRevenue.toFixed(2) || '0.00'}
+            Nu${stats?.todayRevenue.toFixed(2) || '0.00'}
           </div>
           <p className="text-[10px] sm:text-[11px] text-emerald-600 font-semibold flex items-center gap-1">
             <TrendingUp className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
@@ -166,7 +166,7 @@ export const AdminDashboardPage: React.FC = () => {
                   <td className="py-3 font-bold text-slate-900 dark:text-white">#{order.orderNumber}</td>
                   <td className="py-3 font-bold text-brand-500">Table #{order.tableNumber}</td>
                   <td className="py-3">{order.customerName || 'Guest'}</td>
-                  <td className="py-3 font-extrabold">${order.totalAmount.toFixed(2)}</td>
+                  <td className="py-3 font-extrabold">Nu${order.totalAmount.toFixed(2)}</td>
                   <td className="py-3">
                     <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-brand-500/10 text-brand-600 border border-brand-500/20">
                       {order.status}
