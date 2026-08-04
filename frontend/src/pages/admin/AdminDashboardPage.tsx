@@ -173,22 +173,9 @@ export const AdminDashboardPage: React.FC = () => {
                         {order.status}
                       </span>
                     </td>
-
-                    //Date and time display for the order creation time
-
-                    <td className="py-3">
-                      <div className="flex flex-col">
-                        <span className="text-slate-700 dark:text-slate-300 font-medium">
-                          {new Date(order.createdAt).toLocaleDateString([], { year: 'numeric', month: 'short', day: 'numeric' })}
-                        </span>
-
-                        <span className="text-xs text-slate-400">
-                          {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                      </div>
+                    <td className="py-3 text-slate-400">
+                      {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </td>
-
-
                   </tr>
                 ))}
               </tbody>
