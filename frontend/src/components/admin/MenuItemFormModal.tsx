@@ -36,10 +36,23 @@ export const MenuItemFormModal: React.FC<MenuItemFormModalProps> = ({
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [categoryId, setCategoryId] = useState('');
   const [isAvailable, setIsAvailable] = useState(true);
   const [isTodaySpecial, setIsTodaySpecial] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImageUrl(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+    setSelectedFile(file);
+  };
+
 
   useEffect(() => {
     if (itemToEdit) {
@@ -190,6 +203,12 @@ export const MenuItemFormModal: React.FC<MenuItemFormModalProps> = ({
               value={imageUrl}
               onChange={(e) => setImageUrl(e.target.value)}
               className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-white"
+            />
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="mt-2 w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-white"
             />
 
             <div className="flex gap-2 overflow-x-auto no-scrollbar py-1">
