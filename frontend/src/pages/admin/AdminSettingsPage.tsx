@@ -13,7 +13,7 @@ export const AdminSettingsPage: React.FC = () => {
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [address, setAddress] = useState('');
-  const [currency, setCurrency] = useState('$');
+  const [currency, setCurrency] = useState('Nu');
   const [tableCount, setTableCount] = useState(12);
 
   const [isLoading, setIsLoading] = useState(true);
