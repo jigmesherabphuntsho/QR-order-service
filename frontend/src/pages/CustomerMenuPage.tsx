@@ -120,7 +120,7 @@ export const CustomerMenuPage: React.FC = () => {
       />
 
       {/* Menu Items Grid */}
-      <main className="max-w-7xl mx-auto px-3 sm:px-6 pt-4 sm:pt-6">
+      <main className="max-w-7xl mx-auto px-3 sm:px-6 pt-20 sm:pt-6">
         {isLoading ? (
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
             {[...Array(8)].map((_, i) => (

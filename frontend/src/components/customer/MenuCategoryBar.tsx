@@ -22,7 +22,7 @@ export const MenuCategoryBar: React.FC<MenuCategoryBarProps> = ({
   onToggleTodayOnly,
 }) => {
   return (
-    <div className="sticky top-16 z-30 bg-slate-50/90 dark:bg-slate-950/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 py-3 px-4 sm:px-6 transition-colors duration-200">
+    <div className="sticky top-0 z-40 bg-slate-50/90 dark:bg-slate-950/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 py-3 px-4 sm:px-6 transition-colors duration-200">
       <div className="max-w-7xl mx-auto space-y-3">
         
         {/* Search & Filter row */}
