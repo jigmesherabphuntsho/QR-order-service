@@ -82,7 +82,7 @@ export const CartDrawer: React.FC = () => {
     <div className="fixed inset-0 z-50 overflow-hidden bg-slate-950/70 backdrop-blur-sm transition-opacity">
       <div className="absolute inset-y-0 right-0 max-w-full flex">
         <div className="w-full sm:max-w-md bg-white dark:bg-slate-900 shadow-2xl flex flex-col transition-transform duration-300">
-          
+
           {/* Drawer Header */}
           <div className="p-4 sm:p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-950">
             <div className="flex items-center gap-3">
@@ -179,7 +179,7 @@ export const CartDrawer: React.FC = () => {
                           </button>
                         </div>
                         <p className="text-xs font-extrabold text-brand-600 dark:text-brand-400 mt-0.5">
-                          ${(item.menuItem.price * item.quantity).toFixed(2)}
+                          Nu {(item.menuItem.price * item.quantity).toFixed(2)}
                         </p>
                         {item.notes && (
                           <p className="text-[11px] text-amber-600 dark:text-amber-400 font-medium truncate mt-0.5">
@@ -234,7 +234,7 @@ export const CartDrawer: React.FC = () => {
               <div className="space-y-1 text-xs">
                 <div className="flex justify-between text-slate-500">
                   <span>Items Total</span>
-                  <span className="font-semibold text-slate-900 dark:text-white">${totalAmount.toFixed(2)}</span>
+                  <span className="font-semibold text-slate-900 dark:text-white">Nu {totalAmount.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-slate-500">
                   <span>Taxes & Service Fee</span>
@@ -242,7 +242,7 @@ export const CartDrawer: React.FC = () => {
                 </div>
                 <div className="flex justify-between text-base font-extrabold text-slate-900 dark:text-white pt-2 border-t border-slate-200 dark:border-slate-800">
                   <span>Grand Total</span>
-                  <span className="text-brand-600 dark:text-brand-400">${totalAmount.toFixed(2)}</span>
+                  <span className="text-brand-600 dark:text-brand-400">Nu {totalAmount.toFixed(2)}</span>
                 </div>
               </div>
 
