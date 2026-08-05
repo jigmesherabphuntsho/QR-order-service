@@ -127,12 +127,16 @@ export const api = {
       body: JSON.stringify(orderData),
     });
   },
-  getOrders: async (params?: { status?: string; tableNumber?: string }) => {
+  getOrders: async (params?: { status?: string; tableNumber?: string; startDate?: string; endDate?: string; page?: number; limit?: number }) => {
     const query = new URLSearchParams();
     if (params?.status) query.append('status', params.status);
     if (params?.tableNumber) query.append('tableNumber', params.tableNumber);
+    if (params?.startDate) query.append('startDate', params.startDate);
+    if (params?.endDate) query.append('endDate', params.endDate);
+    if (params?.page) query.append('page', params.page.toString());
+    if (params?.limit) query.append('limit', params.limit.toString());
     const queryString = query.toString() ? `?${query.toString()}` : '';
-    return request<{ success: boolean; count: number; orders: Order[] }>(`/orders${queryString}`, {
+    return request<{ success: boolean; page: number; limit: number; total: number; orders: Order[] }>(`/orders${queryString}`, {
       headers: getHeaders(true),
     });
   },

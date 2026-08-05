@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { ChefHat, Radio, Filter, RefreshCw, Volume2 } from 'lucide-react';
 import { Order, OrderStatus } from '../../types';
 import { api } from '../../services/api';
@@ -11,12 +12,22 @@ export const AdminOrdersPage: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [selectedStatus, setSelectedStatus] = useState<string>('ALL');
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [startDate, setStartDate] = useState<string>('');
+  const [endDate, setEndDate] = useState<string>('');
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const pageSize = 10;
   const { socket, isConnected } = useSocket();
 
   const fetchOrders = async () => {
     try {
       setIsLoading(true);
-      const res = await api.getOrders({ status: selectedStatus });
+      const res = await api.getOrders({
+        status: selectedStatus,
+        startDate: startDate || undefined,
+        endDate: endDate || undefined,
+        page: currentPage,
+        limit: pageSize,
+      });
       if (res.success) {
         setOrders(res.orders);
       }
@@ -29,15 +40,13 @@ export const AdminOrdersPage: React.FC = () => {
 
   useEffect(() => {
     fetchOrders();
-    const interval = setInterval(() => {
-      api.getOrders({ status: selectedStatus })
-        .then((res) => {
-          if (res.success) setOrders(res.orders);
-        })
-        .catch(console.error);
-    }, 5000);
+    const interval = setInterval(() => api.getOrders({ status: selectedStatus })
+      .then((res) => {
+        if (res.success) setOrders(res.orders);
+      })
+      .catch(console.error), 5000);
     return () => clearInterval(interval);
-  }, [selectedStatus]);
+  }, [selectedStatus, startDate, endDate, currentPage]);
 
   // Real-time Socket Listener for New Incoming Orders
   useEffect(() => {
@@ -143,6 +152,29 @@ export const AdminOrdersPage: React.FC = () => {
         </button>
       </div>
 
+      {/* Date Filter */}
+      <div className="flex items-center gap-2 mb-4">
+        <input
+          type="date"
+          value={startDate}
+          onChange={e => setStartDate(e.target.value)}
+          className="rounded p-1 border dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+        />
+        <span>–</span>
+        <input
+          type="date"
+          value={endDate}
+          onChange={e => setEndDate(e.target.value)}
+          className="rounded p-1 border dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+        />
+        <button
+          onClick={() => { setCurrentPage(1); fetchOrders(); }}
+          className="px-3 py-1 bg-brand-500 text-white rounded hover:bg-brand-600"
+        >
+          Apply
+        </button>
+      </div>
+
       {/* Status Filter Bar */}
       <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
         {statuses.map((st) => (
@@ -185,6 +217,24 @@ export const AdminOrdersPage: React.FC = () => {
               onUpdateStatus={handleUpdateStatus}
             />
           ))}
+        {/* Pagination Controls */}
+        <div className="flex justify-center items-center gap-4 mt-6">
+          <button
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage(p => p - 1)}
+            className="p-2 disabled:opacity-50"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <span className="text-sm">Page {currentPage}</span>
+          <button
+            disabled={orders.length < pageSize}
+            onClick={() => setCurrentPage(p => p + 1)}
+            className="p-2 disabled:opacity-50"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </div>
         </div>
       )}
     </AdminLayout>

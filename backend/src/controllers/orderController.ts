@@ -86,16 +86,24 @@ export const createOrder = async (req: Request, res: Response) => {
 
 export const getOrders = async (req: Request, res: Response) => {
   try {
-    const { status, tableNumber, date } = req.query;
+    const { status, tableNumber, startDate, endDate, page = '1', limit = '10' } = req.query;
 
     const where: any = {};
     if (status && typeof status === 'string' && status !== 'ALL') {
       where.status = status;
     }
-
     if (tableNumber && typeof tableNumber === 'string') {
       where.tableNumber = parseInt(tableNumber);
     }
+    if (startDate && typeof startDate === 'string') {
+      where.createdAt = { ...(where.createdAt || {}), gte: new Date(startDate) };
+    }
+    if (endDate && typeof endDate === 'string') {
+      where.createdAt = { ...(where.createdAt || {}), lte: new Date(endDate) };
+    }
+
+    const pageNum = parseInt(page as string, 10);
+    const pageSize = parseInt(limit as string, 10);
 
     const orders = await prisma.order.findMany({
       where,
@@ -109,9 +117,13 @@ export const getOrders = async (req: Request, res: Response) => {
         },
       },
       orderBy: { createdAt: 'desc' },
+      skip: (pageNum - 1) * pageSize,
+      take: pageSize,
     });
 
-    return res.json({ success: true, count: orders.length, orders });
+    const total = await prisma.order.count({ where });
+
+    return res.json({ success: true, page: pageNum, limit: pageSize, total, orders });
   } catch (error: any) {
     return res.status(500).json({ success: false, message: error.message });
   }
