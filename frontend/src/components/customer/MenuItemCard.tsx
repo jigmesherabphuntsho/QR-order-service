@@ -9,7 +9,7 @@ interface MenuItemCardProps {
   currency?: string;
 }
 
-export const MenuItemCard: React.FC<MenuItemCardProps> = ({ item, onItemClick, currency = 'Nu' }) => {
+export const MenuItemCard: React.FC<MenuItemCardProps> = ({ item, onItemClick, currency = 'Nu ' }) => {
   const { addToCart, cart } = useCart();
 
   const cartEntry = cart.find((ci) => ci.menuItem.id === item.id);
@@ -32,9 +32,8 @@ export const MenuItemCard: React.FC<MenuItemCardProps> = ({ item, onItemClick, c
         <img
           src={item.imageUrl}
           alt={item.name}
-          className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ${
-            !item.isAvailable ? 'opacity-50 grayscale' : ''
-          }`}
+          className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ${!item.isAvailable ? 'opacity-50 grayscale' : ''
+            }`}
           loading="lazy"
         />
 
@@ -89,11 +88,10 @@ export const MenuItemCard: React.FC<MenuItemCardProps> = ({ item, onItemClick, c
           <button
             onClick={handleQuickAdd}
             disabled={!item.isAvailable}
-            className={`relative flex items-center justify-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl text-xs font-bold transition-all ${
-              item.isAvailable
+            className={`relative flex items-center justify-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl text-xs font-bold transition-all ${item.isAvailable
                 ? 'bg-brand-500 hover:bg-brand-600 active:scale-95 text-white shadow-md shadow-brand-500/20'
                 : 'bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed'
-            }`}
+              }`}
           >
             <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             <span className="hidden sm:inline">Add</span>
