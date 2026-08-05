@@ -9,7 +9,7 @@ interface ItemDetailModalProps {
   currency?: string;
 }
 
-export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({ item, onClose, currency = 'Nu ' }) => {
+export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({ item, onClose, currency = 'Nu\u00A0' }) => {
   if (!item) return null;
 
   const { addToCart, setIsCartOpen } = useCart();
@@ -115,10 +115,10 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({ item, onClose,
             onClick={handleAddToCart}
             disabled={!item.isAvailable}
             className={`w-full py-3.5 px-6 rounded-2xl font-bold text-sm flex items-center justify-between transition-all ${isAdded
-                ? 'bg-emerald-600 text-white'
-                : item.isAvailable
-                  ? 'bg-brand-500 hover:bg-brand-600 text-white shadow-lg shadow-brand-500/25 active:scale-[0.99]'
-                  : 'bg-slate-300 dark:bg-slate-800 text-slate-500 cursor-not-allowed'
+              ? 'bg-emerald-600 text-white'
+              : item.isAvailable
+                ? 'bg-brand-500 hover:bg-brand-600 text-white shadow-lg shadow-brand-500/25 active:scale-[0.99]'
+                : 'bg-slate-300 dark:bg-slate-800 text-slate-500 cursor-not-allowed'
               }`}
           >
             {isAdded ? (

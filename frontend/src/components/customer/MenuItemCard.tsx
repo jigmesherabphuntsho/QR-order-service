@@ -9,7 +9,7 @@ interface MenuItemCardProps {
   currency?: string;
 }
 
-export const MenuItemCard: React.FC<MenuItemCardProps> = ({ item, onItemClick, currency = 'Nu ' }) => {
+export const MenuItemCard: React.FC<MenuItemCardProps> = ({ item, onItemClick, currency = 'Nu\u00A0' }) => {
   const { addToCart, cart } = useCart();
 
   const cartEntry = cart.find((ci) => ci.menuItem.id === item.id);
