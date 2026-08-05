@@ -152,7 +152,7 @@ Resturent Order/
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/Diwas03/QR-order-service.git
+git clone https://github.com/jigmesherabphuntsho/QR-order-service.git
 ```
 
 ### 2. Install Dependencies
