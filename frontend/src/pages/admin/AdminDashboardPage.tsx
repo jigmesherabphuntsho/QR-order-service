@@ -206,7 +206,7 @@ export const AdminDashboardPage: React.FC = () => {
               </div>
               <div className="flex items-center justify-between text-xs">
                 <span className="text-slate-600 dark:text-slate-400">{order.customerName || 'Guest'}</span>
-                <span className="font-extrabold text-slate-900 dark:text-white">Nu {order.totalAmount.toFixed(2)}</span>
+                <span className="font-extrabold text-slate-900 dark:text-white">NU {order.totalAmount.toFixed(2)}</span>
               </div>
               <div className="text-[11px] text-slate-400">
                 {new Date(order.createdAt).toLocaleString([], {
