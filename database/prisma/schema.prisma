@@ -17,7 +17,7 @@ model Restaurant {
   phone        String   @default("+1 (555) 234-5678")
   email        String   @default("info@gourmethaven.com")
   address      String   @default("123 Culinary St, Foodville")
-  currency     String   @default("$")
+  currency     String   @default("Nu ")
   tableCount   Int      @default(12)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt

@@ -24,7 +24,7 @@ async function main() {
       phone: '+1 (555) 839-2001',
       email: 'contact@gourmethaven.com',
       address: '450 Grand Avenue, Downtown',
-      currency: '$',
+      currency: 'Nu ',
       tableCount: 12,
     },
   });
