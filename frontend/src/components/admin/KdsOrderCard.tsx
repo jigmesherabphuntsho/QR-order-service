@@ -98,7 +98,7 @@ export const KdsOrderCard: React.FC<KdsOrderCardProps> = ({ order, onUpdateStatu
       <div className="p-4 bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 space-y-3">
         <div className="flex items-center justify-between text-xs font-bold">
           <span className="text-slate-500">Total Price:</span>
-          <span className="text-sm font-extrabold text-slate-900 dark:text-white">Nu {order.totalAmount.toFixed(2)}</span>
+          <span className="text-sm font-extrabold text-slate-900 dark:text-white"> Nu {order.totalAmount.toFixed(2)}</span>
         </div>
 
         {/* Action Controls */}
