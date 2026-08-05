@@ -81,7 +81,7 @@ export const MenuItemCard: React.FC<MenuItemCardProps> = ({ item, onItemClick, c
           <div>
             <span className="text-xs text-slate-400 dark:text-slate-500 font-medium hidden sm:block">Price</span>
             <div className="text-sm sm:text-lg font-extrabold text-slate-900 dark:text-white">
-              {currency}{item.price.toFixed(2)}
+              Nu {item.price.toFixed(2)}
             </div>
           </div>
 
@@ -89,8 +89,8 @@ export const MenuItemCard: React.FC<MenuItemCardProps> = ({ item, onItemClick, c
             onClick={handleQuickAdd}
             disabled={!item.isAvailable}
             className={`relative flex items-center justify-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl text-xs font-bold transition-all ${item.isAvailable
-                ? 'bg-brand-500 hover:bg-brand-600 active:scale-95 text-white shadow-md shadow-brand-500/20'
-                : 'bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed'
+              ? 'bg-brand-500 hover:bg-brand-600 active:scale-95 text-white shadow-md shadow-brand-500/20'
+              : 'bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed'
               }`}
           >
             <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />

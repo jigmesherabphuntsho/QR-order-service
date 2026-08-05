@@ -63,7 +63,7 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({ item, onClose,
                 {item.name}
               </h2>
               <span className="text-xl font-extrabold text-brand-600 dark:text-brand-400">
-                {currency}{item.price.toFixed(2)}
+                Nu {item.price.toFixed(2)}
               </span>
             </div>
             <p className="mt-2 text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
@@ -129,7 +129,7 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({ item, onClose,
               <>
                 <span>Add to Cart ({quantity})</span>
                 <span className="font-extrabold text-base">
-                  {currency}{(item.price * quantity).toFixed(2)}
+                  Nu {(item.price * quantity).toFixed(2)}
                 </span>
               </>
             )}
