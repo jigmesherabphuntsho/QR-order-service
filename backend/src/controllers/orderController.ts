@@ -99,7 +99,9 @@ export const getOrders = async (req: Request, res: Response) => {
       where.createdAt = { ...(where.createdAt || {}), gte: new Date(startDate) };
     }
     if (endDate && typeof endDate === 'string') {
-      where.createdAt = { ...(where.createdAt || {}), lte: new Date(endDate) };
+      const end = new Date(endDate);
+      end.setHours(23, 59, 59, 999); // include entire day
+      where.createdAt = { ...(where.createdAt || {}), lte: end };
     }
 
     const pageNum = parseInt(page as string, 10);

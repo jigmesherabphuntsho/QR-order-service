@@ -63,31 +63,7 @@ export const AdminDashboardPage: React.FC = () => {
         </button>
       </div>
 
-      {/* Enhanced Filter Card */}
-      <div className="mt-4 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900 dark:to-purple-900 rounded-xl shadow-md flex flex-col sm:flex-row items-center gap-4">
-        <Calendar className="w-5 h-5 text-indigo-600 dark:text-indigo-300" />
-        <div className="flex items-center gap-2">
-          <input
-            type="date"
-            value={startDate}
-            onChange={e => setStartDate(e.target.value)}
-            className="rounded p-1 border dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
-          <span className="text-sm text-slate-600 dark:text-slate-300">–</span>
-          <input
-            type="date"
-            value={endDate}
-            onChange={e => setEndDate(e.target.value)}
-            className="rounded p-1 border dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
-        </div>
-        <button
-          onClick={() => { setCurrentPage(1); fetchDashboardData(); }}
-          className="px-3 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors"
-        >
-          Apply Filter
-        </button>
-      </div>
+
 
       {/* Metric Cards Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
@@ -166,6 +142,31 @@ export const AdminDashboardPage: React.FC = () => {
             <ChefHat className="w-4 h-4" />
             <span>Open Live KDS Screen</span>
           </Link>
+        {/* Moved Filter Card */}
+        <div className="mt-4 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900 dark:to-purple-900 rounded-xl shadow-md flex flex-col sm:flex-row items-center gap-4">
+          <Calendar className="w-5 h-5 text-indigo-600 dark:text-indigo-300" />
+          <div className="flex items-center gap-2">
+            <input
+              type="date"
+              value={startDate}
+              onChange={e => setStartDate(e.target.value)}
+              className="rounded p-1 border dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+            <span className="text-sm text-slate-600 dark:text-slate-300">–</span>
+            <input
+              type="date"
+              value={endDate}
+              onChange={e => setEndDate(e.target.value)}
+              className="rounded p-1 border dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+          <button
+            onClick={() => { setCurrentPage(1); fetchDashboardData(); }}
+            className="px-3 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors"
+          >
+            Apply Filter
+          </button>
+        </div>
         </div>
       </div>
 
