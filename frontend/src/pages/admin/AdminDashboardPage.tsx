@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { DollarSign, ShoppingBag, QrCode, ChefHat, TrendingUp, RefreshCw } from 'lucide-react';
+import { DollarSign, ShoppingBag, QrCode, ChefHat, TrendingUp, RefreshCw, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 import { DashboardStats, Order } from '../../types';
 import { api } from '../../services/api';
 import { AdminLayout } from '../../components/admin/AdminLayout';
@@ -10,15 +10,26 @@ export const AdminDashboardPage: React.FC = () => {
   const [recentOrders, setRecentOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const [startDate, setStartDate] = useState<string>('');
+  const [endDate, setEndDate] = useState<string>('');
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const pageSize = 10;
+
   const fetchDashboardData = async () => {
     try {
       setIsLoading(true);
       const [resStats, resOrders] = await Promise.all([
         api.getDashboardStats(),
-        api.getOrders({ status: 'ALL' }),
+        api.getOrders({
+          status: 'ALL',
+          startDate,
+          endDate,
+          page: currentPage,
+          limit: pageSize,
+        }),
       ]);
       if (resStats.success) setStats(resStats.stats);
-      if (resOrders.success) setRecentOrders(resOrders.orders.slice(0, 5));
+      if (resOrders.success) setRecentOrders(resOrders.orders);
     } catch (err) {
       console.error(err);
     } finally {
@@ -28,7 +39,7 @@ export const AdminDashboardPage: React.FC = () => {
 
   useEffect(() => {
     fetchDashboardData();
-  }, []);
+  }, [currentPage]);
 
   return (
     <AdminLayout>
@@ -49,6 +60,32 @@ export const AdminDashboardPage: React.FC = () => {
         >
           <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
           <span>Refresh Stats</span>
+        </button>
+      </div>
+
+      {/* Enhanced Filter Card */}
+      <div className="mt-4 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900 dark:to-purple-900 rounded-xl shadow-md flex flex-col sm:flex-row items-center gap-4">
+        <Calendar className="w-5 h-5 text-indigo-600 dark:text-indigo-300" />
+        <div className="flex items-center gap-2">
+          <input
+            type="date"
+            value={startDate}
+            onChange={e => setStartDate(e.target.value)}
+            className="rounded p-1 border dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+          <span className="text-sm text-slate-600 dark:text-slate-300">–</span>
+          <input
+            type="date"
+            value={endDate}
+            onChange={e => setEndDate(e.target.value)}
+            className="rounded p-1 border dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+        <button
+          onClick={() => { setCurrentPage(1); fetchDashboardData(); }}
+          className="px-3 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors"
+        >
+          Apply Filter
         </button>
       </div>
 
