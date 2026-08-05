@@ -36,7 +36,7 @@ export const OrderSuccessPage: React.FC = () => {
   return (
     <div className="min-h-screen py-12 px-4 sm:px-6 flex items-center justify-center">
       <div className="max-w-lg w-full bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-xl text-center space-y-6">
-        
+
         {/* Success Icon */}
         <div className="w-20 h-20 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center mx-auto ring-8 ring-emerald-500/20 animate-bounce">
           <CheckCircle2 className="w-10 h-10 stroke-[2.5]" />
@@ -81,7 +81,7 @@ export const OrderSuccessPage: React.FC = () => {
                   {item.quantity}x {item.menuItem?.name || 'Item'}
                 </span>
                 <span className="font-bold text-slate-900 dark:text-white">
-                  ${(item.price * item.quantity).toFixed(2)}
+                  Nu {(item.price * item.quantity).toFixed(2)}
                 </span>
               </div>
             ))}
@@ -89,7 +89,7 @@ export const OrderSuccessPage: React.FC = () => {
 
           <div className="flex justify-between text-sm font-extrabold text-slate-900 dark:text-white pt-2 border-t border-slate-100 dark:border-slate-800">
             <span>Total Amount Paid</span>
-            <span className="text-brand-500">Nu${order?.totalAmount.toFixed(2)}</span>
+            <span className="text-brand-500">Nu {order?.totalAmount.toFixed(2)}</span>
           </div>
         </div>
 

@@ -74,11 +74,11 @@ export const CustomerMenuPage: React.FC = () => {
 
   return (
     <div className="min-h-screen pb-24">
-      
+
       {/* Restaurant Hero Banner */}
       <section className="relative bg-gradient-to-br from-slate-900 via-slate-950 to-brand-950 text-white py-8 px-4 sm:py-12 sm:px-6 overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-brand-500/20 via-transparent to-transparent pointer-events-none" />
-        
+
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-500/20 text-brand-300 border border-brand-500/30 text-xs font-semibold">
@@ -173,7 +173,7 @@ export const CustomerMenuPage: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="font-extrabold text-base">${totalAmount.toFixed(2)}</span>
+              <span className="font-extrabold text-base">Nu {totalAmount.toFixed(2)}</span>
               <ArrowRight className="w-5 h-5" />
             </div>
           </button>
