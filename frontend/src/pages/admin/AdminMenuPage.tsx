@@ -171,17 +171,16 @@ export const AdminMenuPage: React.FC = () => {
                   </td>
 
                   <td className="py-3 px-4 font-extrabold text-slate-900 dark:text-white">
-                    ${item.price.toFixed(2)}
+                    Nu {item.price.toFixed(2)}
                   </td>
 
                   <td className="py-3 px-4">
                     <button
                       onClick={() => handleToggleAvailability(item.id)}
-                      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all ${
-                        item.isAvailable
+                      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all ${item.isAvailable
                           ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/30'
                           : 'bg-red-500/10 text-red-600 border border-red-500/30'
-                      }`}
+                        }`}
                     >
                       {item.isAvailable ? (
                         <>
@@ -260,7 +259,7 @@ export const AdminMenuPage: React.FC = () => {
                       <p className="text-[11px] text-slate-400 mt-0.5 line-clamp-1">{item.description}</p>
                       <div className="flex items-center gap-2 mt-1">
                         <span className="text-xs font-extrabold text-slate-900 dark:text-white">
-                          ${item.price.toFixed(2)}
+                          Nu {item.price.toFixed(2)}
                         </span>
                         <span className="text-[11px] text-slate-400">
                           {item.category?.name || 'Uncategorized'}
@@ -290,11 +289,10 @@ export const AdminMenuPage: React.FC = () => {
               <div className="px-3 pb-3">
                 <button
                   onClick={() => handleToggleAvailability(item.id)}
-                  className={`w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                    item.isAvailable
+                  className={`w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${item.isAvailable
                       ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/30'
                       : 'bg-red-500/10 text-red-600 border border-red-500/30'
-                  }`}
+                    }`}
                 >
                   {item.isAvailable ? (
                     <><ToggleRight className="w-4 h-4 text-emerald-500" /><span>In Stock — Tap to Toggle</span></>
