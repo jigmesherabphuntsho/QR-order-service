@@ -39,11 +39,19 @@ export const AdminOrdersPage: React.FC = () => {
 
   useEffect(() => {
     fetchOrders();
-    const interval = setInterval(() => api.getOrders({ status: selectedStatus })
-      .then((res) => {
-        if (res.success) setOrders(res.orders);
+    const interval = setInterval(() => {
+      api.getOrders({
+        status: selectedStatus,
+        startDate: startDate || undefined,
+        endDate: endDate || undefined,
+        page: currentPage,
+        limit: pageSize,
       })
-      .catch(console.error), 5000);
+        .then((res) => {
+          if (res.success) setOrders(res.orders);
+        })
+        .catch(console.error);
+    }, 5000);
     return () => clearInterval(interval);
   }, [selectedStatus, startDate, endDate, currentPage]);
 

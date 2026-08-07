@@ -1,5 +1,5 @@
 import React from 'react';
-import { Clock, QrCode, User, FileText, CheckCircle, ArrowRight, Ban, ChefHat } from 'lucide-react';
+import { Clock, QrCode, User, FileText, CheckCircle, ArrowRight, Ban, ChefHat, Calendar } from 'lucide-react';
 import { Order, OrderStatus } from '../../types';
 
 interface KdsOrderCardProps {
@@ -23,7 +23,13 @@ export const KdsOrderCard: React.FC<KdsOrderCardProps> = ({ order, onUpdateStatu
     }
   };
 
-  const formattedTime = new Date(order.createdAt).toLocaleTimeString([], {
+  const orderDate = new Date(order.createdAt);
+  const formattedDate = orderDate.toLocaleDateString([], {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+  const formattedTime = orderDate.toLocaleTimeString([], {
     hour: '2-digit',
     minute: '2-digit',
   });
@@ -53,9 +59,16 @@ export const KdsOrderCard: React.FC<KdsOrderCardProps> = ({ order, onUpdateStatu
             <User className="w-3.5 h-3.5 text-brand-500" />
             <span>{order.customerName || 'Guest'}</span>
           </div>
-          <div className="flex items-center gap-1">
-            <Clock className="w-3.5 h-3.5" />
-            <span>{formattedTime}</span>
+          <div className="flex items-center gap-2 font-medium text-[11px] text-slate-500 dark:text-slate-400">
+            <span className="flex items-center gap-1">
+              <Calendar className="w-3.5 h-3.5 text-slate-400" />
+              {formattedDate}
+            </span>
+            <span>•</span>
+            <span className="flex items-center gap-1">
+              <Clock className="w-3.5 h-3.5 text-slate-400" />
+              {formattedTime}
+            </span>
           </div>
         </div>
 
