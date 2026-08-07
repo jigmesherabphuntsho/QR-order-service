@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Store, User, Mail, Lock, Phone, MapPin, DollarSign, ArrowRight, ShieldCheck, Sparkles, Building, Layers } from 'lucide-react';
+import { Store, User, Mail, Lock, Phone, MapPin, DollarSign, ArrowRight, ShieldCheck, Sparkles, Building, Layers, AlertCircle, X } from 'lucide-react';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
@@ -19,24 +19,32 @@ export const AdminRegisterPage: React.FC = () => {
   const [tableCount, setTableCount] = useState(6);
 
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage(null);
 
     if (!name || !email || !password || !restaurantName) {
-      toast.error('Please fill in all required fields.');
+      const msg = 'Please fill in all required fields (Manager Name, Email, Password, Restaurant Name).';
+      setErrorMessage(msg);
+      toast.error(msg);
       return;
     }
 
     if (password !== confirmPassword) {
-      toast.error('Passwords do not match.');
+      const msg = 'Passwords do not match. Please re-enter your password.';
+      setErrorMessage(msg);
+      toast.error(msg);
       return;
     }
 
     if (password.length < 6) {
-      toast.error('Password must be at least 6 characters long.');
+      const msg = 'Password must be at least 6 characters long.';
+      setErrorMessage(msg);
+      toast.error(msg);
       return;
     }
 
@@ -58,9 +66,16 @@ export const AdminRegisterPage: React.FC = () => {
         toast.success(`🎉 ${res.restaurant.name} registered successfully!`);
         login(res.token, res.admin);
         navigate('/admin/dashboard');
+      } else {
+        const msg = res.message || 'Registration failed.';
+        setErrorMessage(msg);
+        toast.error(msg);
       }
     } catch (err: any) {
-      toast.error(err.message || 'Registration failed.');
+      console.error('Registration Catch Error:', err);
+      const msg = err.message || 'Server error occurred during registration. Please try again.';
+      setErrorMessage(msg);
+      toast.error(msg);
     } finally {
       setIsLoading(false);
     }
@@ -124,6 +139,26 @@ export const AdminRegisterPage: React.FC = () => {
               Enter your details to create your admin account and launch your restaurant.
             </p>
           </div>
+
+          {/* Error Alert Pop-up */}
+          {errorMessage && (
+            <div className="p-4 rounded-2xl bg-red-500/10 border-2 border-red-500/30 text-red-600 dark:text-red-400 text-xs shadow-lg flex items-start justify-between gap-3 animate-shake">
+              <div className="flex items-start gap-2.5">
+                <AlertCircle className="w-5 h-5 shrink-0 text-red-500 mt-0.5" />
+                <div>
+                  <h4 className="font-extrabold text-sm text-red-700 dark:text-red-300">Registration Failed</h4>
+                  <p className="mt-0.5 font-medium leading-relaxed">{errorMessage}</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setErrorMessage(null)}
+                className="p-1 rounded-lg hover:bg-red-500/20 text-red-500 transition-colors shrink-0"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Manager Details Section */}

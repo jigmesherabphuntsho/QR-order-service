@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { UtensilsCrossed, Lock, Mail, ArrowRight, Loader2, Sparkles } from 'lucide-react';
+import { UtensilsCrossed, Lock, Mail, ArrowRight, Loader2, Sparkles, AlertCircle, X } from 'lucide-react';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
@@ -12,9 +12,11 @@ export const AdminLoginPage: React.FC = () => {
   const [email, setEmail] = useState('admin@restaurant.com');
   const [password, setPassword] = useState('admin123');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage(null);
     try {
       setIsSubmitting(true);
       const res = await api.login({ email, password });
@@ -22,9 +24,16 @@ export const AdminLoginPage: React.FC = () => {
         login(res.token, res.admin);
         toast.success(`Welcome back, ${res.admin.name}!`);
         navigate('/admin/dashboard');
+      } else {
+        const msg = res.message || 'Invalid email or password.';
+        setErrorMessage(msg);
+        toast.error(msg);
       }
     } catch (err: any) {
-      toast.error(err.message || 'Invalid email or password.');
+      console.error('Login Catch Error:', err);
+      const msg = err.message || 'Invalid email or password. Please check your credentials.';
+      setErrorMessage(msg);
+      toast.error(msg);
     } finally {
       setIsSubmitting(false);
     }
@@ -33,6 +42,7 @@ export const AdminLoginPage: React.FC = () => {
   const fillDemoAdmin = () => {
     setEmail('admin@restaurant.com');
     setPassword('admin123');
+    setErrorMessage(null);
     toast.success('Demo admin credentials filled!');
   };
 
@@ -52,6 +62,26 @@ export const AdminLoginPage: React.FC = () => {
             Sign in to manage live orders, menu items, & table QR codes.
           </p>
         </div>
+
+        {/* Error Alert Pop-up */}
+        {errorMessage && (
+          <div className="p-4 rounded-2xl bg-red-500/10 border-2 border-red-500/30 text-red-600 dark:text-red-400 text-xs shadow-lg flex items-start justify-between gap-3 animate-shake">
+            <div className="flex items-start gap-2.5">
+              <AlertCircle className="w-5 h-5 shrink-0 text-red-500 mt-0.5" />
+              <div>
+                <h4 className="font-extrabold text-sm text-red-700 dark:text-red-300">Sign In Failed</h4>
+                <p className="mt-0.5 font-medium leading-relaxed">{errorMessage}</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setErrorMessage(null)}
+              className="p-1 rounded-lg hover:bg-red-500/20 text-red-500 transition-colors shrink-0"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        )}
 
         {/* Demo Helper Pill */}
         <button

@@ -45,7 +45,7 @@ export const api = {
     });
   },
   login: async (credentials: { email: string; password: string }) => {
-    return request<{ success: boolean; token: string; admin: AdminUser; restaurant?: Restaurant }>('/auth/login', {
+    return request<{ success: boolean; message?: string; token: string; admin: AdminUser; restaurant?: Restaurant }>('/auth/login', {
       method: 'POST',
       headers: getHeaders(),
       body: JSON.stringify(credentials),

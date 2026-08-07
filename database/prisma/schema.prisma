@@ -13,6 +13,7 @@ model Restaurant {
   id           String     @id @default(uuid())
   name         String     @default("Gourmet Haven")
   tagline      String     @default("Authentic Flavors & Fresh Ingredients")
+  slug         String     @default("gourmet-haven")
   openingHours String     @default("10:00 AM - 10:00 PM")
   phone        String     @default("+1 (555) 234-5678")
   email        String     @default("info@gourmethaven.com")
