@@ -15,6 +15,7 @@ import { OrderSuccessPage } from './pages/OrderSuccessPage';
 import { TrackOrderPage } from './pages/TrackOrderPage';
 import { AdminLoginPage } from './pages/admin/AdminLoginPage';
 import { AdminDashboardPage } from './pages/admin/AdminDashboardPage';
+import { AdminAnalyticsPage } from './pages/admin/AdminAnalyticsPage';
 import { AdminOrdersPage } from './pages/admin/AdminOrdersPage';
 import { AdminMenuPage } from './pages/admin/AdminMenuPage';
 import { AdminQrPage } from './pages/admin/AdminQrPage';
@@ -73,6 +74,14 @@ export const AppContent: React.FC = () => {
             element={
               <ProtectedAdminRoute>
                 <AdminDashboardPage />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="/admin/analytics"
+            element={
+              <ProtectedAdminRoute>
+                <AdminAnalyticsPage />
               </ProtectedAdminRoute>
             }
           />

@@ -94,3 +94,43 @@ export interface DashboardStats {
   totalTables: number;
   occupiedTables: number;
 }
+
+export interface TrendingItem {
+  id: string;
+  name: string;
+  imageUrl?: string;
+  totalQty: number;
+  totalSales: number;
+}
+
+export interface DaySales {
+  date: string;
+  dayName: string;
+  sales: number;
+  orderCount: number;
+}
+
+export interface MonthSales {
+  monthKey: string;
+  monthName: string;
+  sales: number;
+  orderCount: number;
+}
+
+export interface PeakHour {
+  hour: string;
+  hourNum: number;
+  orderCount: number;
+}
+
+export interface AnalyticsData {
+  totalRevenue: number;
+  totalOrdersCount: number;
+  completedOrdersCount: number;
+  averageOrderValue: number;
+  fulfillmentRate: number;
+  trendingItems: TrendingItem[];
+  weeklySales: DaySales[];
+  monthlySales: MonthSales[];
+  peakHours: PeakHour[];
+}

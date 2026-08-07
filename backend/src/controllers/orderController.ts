@@ -256,3 +256,153 @@ export const getDashboardStats = async (req: Request, res: Response) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
+
+export const getBusinessAnalytics = async (req: Request, res: Response) => {
+  try {
+    const { period = 'THIS_MONTH', startDate, endDate } = req.query;
+
+    const now = new Date();
+    let start: Date;
+    let end: Date = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+
+    if (period === 'THIS_WEEK') {
+      const day = now.getDay();
+      const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+      start = new Date(now.setDate(diff));
+      start.setHours(0, 0, 0, 0);
+    } else if (period === 'LAST_30_DAYS') {
+      start = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+      start.setHours(0, 0, 0, 0);
+    } else if (period === 'THIS_YEAR') {
+      start = new Date(now.getFullYear(), 0, 1, 0, 0, 0, 0);
+    } else if (period === 'CUSTOM' && startDate && endDate && typeof startDate === 'string' && typeof endDate === 'string') {
+      start = new Date(`${startDate}T00:00:00.000`);
+      end = new Date(`${endDate}T23:59:59.999`);
+    } else {
+      // Default: THIS_MONTH
+      start = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+    }
+
+    const orders = await prisma.order.findMany({
+      where: {
+        createdAt: {
+          gte: start,
+          lte: end,
+        },
+      },
+      include: {
+        items: {
+          include: {
+            menuItem: {
+              select: { id: true, name: true, price: true, imageUrl: true },
+            },
+          },
+        },
+      },
+      orderBy: { createdAt: 'asc' },
+    });
+
+    const validOrders = orders.filter((o: any) => o.status !== 'CANCELLED');
+    const totalOrdersCount = orders.length;
+    const completedOrdersCount = validOrders.length;
+    const totalRevenue = validOrders.reduce((sum: number, o: any) => sum + o.totalAmount, 0);
+    const averageOrderValue = completedOrdersCount > 0 ? totalRevenue / completedOrdersCount : 0;
+    const fulfillmentRate = totalOrdersCount > 0 ? (completedOrdersCount / totalOrdersCount) * 100 : 0;
+
+    // 1. Trending / Top Selling Food
+    const itemMap = new Map<string, { id: string; name: string; imageUrl?: string; totalQty: number; totalSales: number }>();
+
+    for (const order of validOrders) {
+      for (const item of order.items) {
+        const menuItemId = item.menuItemId || item.menuItem?.id || 'unknown';
+        const name = item.menuItem?.name || 'Unnamed Dish';
+        const imageUrl = item.menuItem?.imageUrl;
+        const qty = item.quantity || 1;
+        const sales = (item.price || item.menuItem?.price || 0) * qty;
+
+        if (itemMap.has(menuItemId)) {
+          const existing = itemMap.get(menuItemId)!;
+          existing.totalQty += qty;
+          existing.totalSales += sales;
+        } else {
+          itemMap.set(menuItemId, { id: menuItemId, name, imageUrl, totalQty: qty, totalSales: sales });
+        }
+      }
+    }
+
+    const trendingItems = Array.from(itemMap.values())
+      .sort((a, b) => b.totalQty - a.totalQty)
+      .slice(0, 6);
+
+    // 2. Weekly Breakdown (Last 7 days)
+    const last7Days: { date: string; dayName: string; sales: number; orderCount: number }[] = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const dateStr = d.toISOString().split('T')[0];
+      const dayName = d.toLocaleDateString([], { weekday: 'short' });
+
+      const dayOrders = orders.filter((o: any) => {
+        const oDate = new Date(o.createdAt).toISOString().split('T')[0];
+        return oDate === dateStr && o.status !== 'CANCELLED';
+      });
+
+      const daySales = dayOrders.reduce((sum: number, o: any) => sum + o.totalAmount, 0);
+      last7Days.push({ date: dateStr, dayName, sales: daySales, orderCount: dayOrders.length });
+    }
+
+    // 3. Monthly Breakdown (Last 12 months)
+    const last12Months: { monthKey: string; monthName: string; sales: number; orderCount: number }[] = [];
+    for (let i = 11; i >= 0; i--) {
+      const d = new Date();
+      d.setMonth(d.getMonth() - i);
+      const year = d.getFullYear();
+      const month = d.getMonth();
+      const monthKey = `${year}-${String(month + 1).padStart(2, '0')}`;
+      const monthName = d.toLocaleDateString([], { month: 'short', year: '2-digit' });
+
+      const monthOrders = orders.filter((o: any) => {
+        const oDate = new Date(o.createdAt);
+        return oDate.getFullYear() === year && oDate.getMonth() === month && o.status !== 'CANCELLED';
+      });
+
+      const monthSales = monthOrders.reduce((sum: number, o: any) => sum + o.totalAmount, 0);
+      last12Months.push({ monthKey, monthName, sales: monthSales, orderCount: monthOrders.length });
+    }
+
+    // 4. Peak Dining Hours Analysis (0-23)
+    const hourlyMap: Record<number, number> = {};
+    for (let h = 0; h < 24; h++) hourlyMap[h] = 0;
+
+    for (const order of validOrders) {
+      const hour = new Date(order.createdAt).getHours();
+      hourlyMap[hour] = (hourlyMap[hour] || 0) + 1;
+    }
+
+    const peakHours = Object.entries(hourlyMap).map(([hour, count]) => ({
+      hour: `${String(hour).padStart(2, '0')}:00`,
+      hourNum: Number(hour),
+      orderCount: count,
+    }));
+
+    return res.json({
+      success: true,
+      period,
+      startDate: start.toISOString(),
+      endDate: end.toISOString(),
+      analytics: {
+        totalRevenue,
+        totalOrdersCount,
+        completedOrdersCount,
+        averageOrderValue,
+        fulfillmentRate,
+        trendingItems,
+        weeklySales: last7Days,
+        monthlySales: last12Months,
+        peakHours,
+      },
+    });
+  } catch (error: any) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};

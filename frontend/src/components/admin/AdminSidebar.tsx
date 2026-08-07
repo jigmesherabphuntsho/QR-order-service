@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, ChefHat, UtensilsCrossed, QrCode, Settings, LogOut, Store } from 'lucide-react';
+import { LayoutDashboard, ChefHat, UtensilsCrossed, QrCode, Settings, LogOut, Store, BarChart3 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 export const AdminSidebar: React.FC = () => {
@@ -14,6 +14,7 @@ export const AdminSidebar: React.FC = () => {
 
   const navItems = [
     { to: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { to: '/admin/analytics', label: 'Business Analytics', icon: BarChart3 },
     { to: '/admin/orders', label: 'Live Orders (KDS)', icon: ChefHat },
     { to: '/admin/menu', label: 'Menu Management', icon: UtensilsCrossed },
     { to: '/admin/qr', label: 'QR Management', icon: QrCode },

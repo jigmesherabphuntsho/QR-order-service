@@ -1,4 +1,4 @@
-import { Restaurant, Category, MenuItem, Order, TableInfo, AdminUser, DashboardStats } from '../types';
+import { Restaurant, Category, MenuItem, Order, TableInfo, AdminUser, DashboardStats, AnalyticsData } from '../types';
 
 const API_BASE = '/api';
 
@@ -152,6 +152,16 @@ export const api = {
   },
   getDashboardStats: async () => {
     return request<{ success: boolean; stats: DashboardStats }>('/orders/stats', {
+      headers: getHeaders(true),
+    });
+  },
+  getBusinessAnalytics: async (params?: { period?: string; startDate?: string; endDate?: string }) => {
+    const query = new URLSearchParams();
+    if (params?.period) query.append('period', params.period);
+    if (params?.startDate) query.append('startDate', params.startDate);
+    if (params?.endDate) query.append('endDate', params.endDate);
+    const queryString = query.toString() ? `?${query.toString()}` : '';
+    return request<{ success: boolean; period: string; startDate: string; endDate: string; analytics: AnalyticsData }>(`/orders/analytics${queryString}`, {
       headers: getHeaders(true),
     });
   },
