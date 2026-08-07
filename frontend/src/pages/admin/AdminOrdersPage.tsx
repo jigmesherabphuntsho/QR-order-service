@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { ChefHat, Radio, Filter, RefreshCw, Volume2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChefHat, Radio, Filter, RefreshCw, Volume2, Calendar, RotateCcw } from 'lucide-react';
 import { Order, OrderStatus } from '../../types';
 import { api } from '../../services/api';
 import { useSocket } from '../../context/SocketContext';
@@ -153,26 +152,49 @@ export const AdminOrdersPage: React.FC = () => {
       </div>
 
       {/* Date Filter */}
-      <div className="flex items-center gap-2 mb-4">
-        <input
-          type="date"
-          value={startDate}
-          onChange={e => setStartDate(e.target.value)}
-          className="rounded p-1 border dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
-        />
-        <span>–</span>
-        <input
-          type="date"
-          value={endDate}
-          onChange={e => setEndDate(e.target.value)}
-          className="rounded p-1 border dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
-        />
-        <button
-          onClick={() => { setCurrentPage(1); fetchOrders(); }}
-          className="px-3 py-1 bg-brand-500 text-white rounded hover:bg-brand-600"
-        >
-          Apply
-        </button>
+      <div className="p-3 sm:p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 text-xs font-semibold">
+            <Calendar className="w-4 h-4 text-brand-500" />
+            <span>Filter Date:</span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-500/50"
+            />
+            <span className="text-xs text-slate-400 font-medium">–</span>
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-500/50"
+            />
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => { setCurrentPage(1); fetchOrders(); }}
+              className="px-3.5 py-1.5 rounded-xl bg-brand-500 hover:bg-brand-600 active:scale-95 text-white font-semibold text-xs transition-all shadow-sm flex items-center gap-1.5"
+            >
+              <Filter className="w-3.5 h-3.5" />
+              <span>Apply</span>
+            </button>
+
+            {(startDate || endDate) && (
+              <button
+                onClick={() => { setStartDate(''); setEndDate(''); setCurrentPage(1); }}
+                className="px-3 py-1.5 rounded-xl bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 active:scale-95 text-slate-700 dark:text-slate-300 font-medium text-xs transition-all flex items-center gap-1"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>Reset</span>
+              </button>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Status Filter Bar */}

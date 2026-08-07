@@ -95,13 +95,17 @@ export const getOrders = async (req: Request, res: Response) => {
     if (tableNumber && typeof tableNumber === 'string') {
       where.tableNumber = parseInt(tableNumber);
     }
-    if (startDate && typeof startDate === 'string') {
-      where.createdAt = { ...(where.createdAt || {}), gte: new Date(startDate) };
+    if (startDate && typeof startDate === 'string' && startDate.trim() !== '') {
+      const start = new Date(startDate.includes('T') ? startDate : `${startDate}T00:00:00.000`);
+      if (!isNaN(start.getTime())) {
+        where.createdAt = { ...(where.createdAt || {}), gte: start };
+      }
     }
-    if (endDate && typeof endDate === 'string') {
-      const end = new Date(endDate);
-      end.setHours(23, 59, 59, 999); // include entire day
-      where.createdAt = { ...(where.createdAt || {}), lte: end };
+    if (endDate && typeof endDate === 'string' && endDate.trim() !== '') {
+      const end = new Date(endDate.includes('T') ? endDate : `${endDate}T23:59:59.999`);
+      if (!isNaN(end.getTime())) {
+        where.createdAt = { ...(where.createdAt || {}), lte: end };
+      }
     }
 
     const pageNum = parseInt(page as string, 10);
