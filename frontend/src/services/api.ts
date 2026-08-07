@@ -27,22 +27,40 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
 
 export const api = {
   // Auth
+  register: async (data: {
+    name: string;
+    email: string;
+    password: string;
+    restaurantName: string;
+    tagline?: string;
+    phone?: string;
+    address?: string;
+    currency?: string;
+    tableCount?: number;
+  }) => {
+    return request<{ success: boolean; message: string; token: string; admin: AdminUser; restaurant: Restaurant }>('/auth/register', {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(data),
+    });
+  },
   login: async (credentials: { email: string; password: string }) => {
-    return request<{ success: boolean; token: string; admin: AdminUser }>('/auth/login', {
+    return request<{ success: boolean; token: string; admin: AdminUser; restaurant?: Restaurant }>('/auth/login', {
       method: 'POST',
       headers: getHeaders(),
       body: JSON.stringify(credentials),
     });
   },
   getMe: async () => {
-    return request<{ success: boolean; admin: AdminUser }>('/auth/me', {
+    return request<{ success: boolean; admin: AdminUser; restaurant?: Restaurant }>('/auth/me', {
       headers: getHeaders(true),
     });
   },
 
   // Restaurant
-  getRestaurant: async () => {
-    return request<{ success: boolean; restaurant: Restaurant }>('/restaurant');
+  getRestaurant: async (restaurantId?: string) => {
+    const query = restaurantId ? `?restaurantId=${encodeURIComponent(restaurantId)}` : '';
+    return request<{ success: boolean; restaurant: Restaurant }>(`/restaurant${query}`);
   },
   updateRestaurant: async (data: Partial<Restaurant>) => {
     return request<{ success: boolean; restaurant: Restaurant }>('/restaurant', {
@@ -53,8 +71,9 @@ export const api = {
   },
 
   // Categories
-  getCategories: async () => {
-    return request<{ success: boolean; categories: Category[] }>('/categories');
+  getCategories: async (restaurantId?: string) => {
+    const query = restaurantId ? `?restaurantId=${encodeURIComponent(restaurantId)}` : '';
+    return request<{ success: boolean; categories: Category[] }>(`/categories${query}`);
   },
   createCategory: async (data: { name: string; description?: string; sortOrder?: number }) => {
     return request<{ success: boolean; category: Category }>('/categories', {
@@ -78,12 +97,13 @@ export const api = {
   },
 
   // Menu
-  getMenuItems: async (params?: { categoryId?: string; search?: string; availableOnly?: boolean; todayOnly?: boolean }) => {
+  getMenuItems: async (params?: { categoryId?: string; search?: string; availableOnly?: boolean; todayOnly?: boolean; restaurantId?: string }) => {
     const query = new URLSearchParams();
     if (params?.categoryId) query.append('categoryId', params.categoryId);
     if (params?.search) query.append('search', params.search);
     if (params?.availableOnly) query.append('availableOnly', 'true');
     if (params?.todayOnly) query.append('todayOnly', 'true');
+    if (params?.restaurantId) query.append('restaurantId', params.restaurantId);
     const queryString = query.toString() ? `?${query.toString()}` : '';
     return request<{ success: boolean; count: number; items: MenuItem[] }>(`/menu${queryString}`);
   },

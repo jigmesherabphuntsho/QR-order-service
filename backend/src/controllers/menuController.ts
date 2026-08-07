@@ -1,11 +1,17 @@
 import { Request, Response } from 'express';
 import { prisma } from '../config/db.js';
+import { AuthenticatedRequest } from '../middleware/auth.js';
 
 export const getMenuItems = async (req: Request, res: Response) => {
   try {
-    const { categoryId, search, availableOnly, todayOnly } = req.query;
+    const { categoryId, search, availableOnly, todayOnly, restaurantId } = req.query;
+    const reqRestaurantId = (req as AuthenticatedRequest).user?.restaurantId || (restaurantId as string);
 
     const where: any = {};
+
+    if (reqRestaurantId) {
+      where.restaurantId = reqRestaurantId;
+    }
 
     if (categoryId && typeof categoryId === 'string' && categoryId !== 'all') {
       where.categoryId = categoryId;
@@ -63,6 +69,7 @@ export const getMenuItemById = async (req: Request, res: Response) => {
 export const createMenuItem = async (req: Request, res: Response) => {
   try {
     const { name, description, price, imageUrl, categoryId, isAvailable, isTodaySpecial, sortOrder } = req.body;
+    const reqRestaurantId = (req as AuthenticatedRequest).user?.restaurantId;
 
     if (!name || !price || !categoryId) {
       return res.status(400).json({ success: false, message: 'Name, price, and category are required.' });
@@ -75,6 +82,7 @@ export const createMenuItem = async (req: Request, res: Response) => {
         price: parseFloat(price),
         imageUrl: imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80',
         categoryId,
+        restaurantId: reqRestaurantId || null,
         isAvailable: isAvailable !== undefined ? Boolean(isAvailable) : true,
         isTodaySpecial: isTodaySpecial !== undefined ? Boolean(isTodaySpecial) : true,
         sortOrder: sortOrder ? parseInt(sortOrder) : 0,

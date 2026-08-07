@@ -1,18 +1,19 @@
 import { Request, Response } from 'express';
 import { prisma } from '../config/db.js';
 import { emitNewOrder, emitOrderStatusUpdate } from '../services/socketService.js';
+import { AuthenticatedRequest } from '../middleware/auth.js';
 
 export const createOrder = async (req: Request, res: Response) => {
   try {
-    const { tableNumber, customerName, items, notes } = req.body;
+    const { tableNumber, customerName, items, notes, restaurantId } = req.body;
 
     if (!tableNumber || !items || !Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ success: false, message: 'Table number and order items are required.' });
     }
 
-    // Verify items exist and calculate total
     let totalAmount = 0;
     const orderItemsData: Array<{ menuItemId: string; quantity: number; price: number; notes?: string }> = [];
+    let detectedRestaurantId: string | null = restaurantId || null;
 
     for (const item of items) {
       const menuItem = await prisma.menuItem.findUnique({ where: { id: item.menuItemId } });
@@ -21,6 +22,10 @@ export const createOrder = async (req: Request, res: Response) => {
       }
       if (!menuItem.isAvailable) {
         return res.status(400).json({ success: false, message: `"${menuItem.name}" is currently unavailable.` });
+      }
+
+      if (!detectedRestaurantId && menuItem.restaurantId) {
+        detectedRestaurantId = menuItem.restaurantId;
       }
 
       const itemPrice = menuItem.price;
@@ -35,13 +40,12 @@ export const createOrder = async (req: Request, res: Response) => {
       });
     }
 
-    // Generate consecutive Order Number
     const lastOrder = await prisma.order.findFirst({
+      where: detectedRestaurantId ? { restaurantId: detectedRestaurantId } : undefined,
       orderBy: { createdAt: 'desc' },
     });
     const orderNumber = lastOrder ? lastOrder.orderNumber + 1 : 1001;
 
-    // Create Order in DB
     const newOrder = await prisma.order.create({
       data: {
         orderNumber,
@@ -50,6 +54,7 @@ export const createOrder = async (req: Request, res: Response) => {
         totalAmount,
         notes: notes || null,
         status: 'PENDING',
+        restaurantId: detectedRestaurantId || null,
         items: {
           create: orderItemsData,
         },
@@ -65,13 +70,14 @@ export const createOrder = async (req: Request, res: Response) => {
       },
     });
 
-    // Mark table as occupied
     await prisma.table.updateMany({
-      where: { number: parseInt(tableNumber) },
+      where: {
+        number: parseInt(tableNumber),
+        ...(detectedRestaurantId ? { restaurantId: detectedRestaurantId } : {}),
+      },
       data: { isOccupied: true },
     });
 
-    // Broadcast Real-time WebSocket event to Kitchen Display & Admin
     emitNewOrder(newOrder);
 
     return res.status(201).json({
@@ -86,9 +92,14 @@ export const createOrder = async (req: Request, res: Response) => {
 
 export const getOrders = async (req: Request, res: Response) => {
   try {
-    const { status, tableNumber, startDate, endDate, page = '1', limit = '10' } = req.query;
+    const { status, tableNumber, startDate, endDate, page = '1', limit = '10', restaurantId } = req.query;
+    const reqRestaurantId = (req as AuthenticatedRequest).user?.restaurantId || (restaurantId as string);
 
     const where: any = {};
+
+    if (reqRestaurantId) {
+      where.restaurantId = reqRestaurantId;
+    }
     if (status && typeof status === 'string' && status !== 'ALL') {
       where.status = status;
     }
@@ -220,14 +231,14 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
 
 export const getDashboardStats = async (req: Request, res: Response) => {
   try {
+    const reqRestaurantId = (req as AuthenticatedRequest).user?.restaurantId || (req.query.restaurantId as string);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const todayOrders = await prisma.order.findMany({
-      where: {
-        createdAt: { gte: today },
-      },
-    });
+    const where: any = { createdAt: { gte: today } };
+    if (reqRestaurantId) where.restaurantId = reqRestaurantId;
+
+    const todayOrders = await prisma.order.findMany({ where });
 
     const totalRevenue = todayOrders
       .filter((o: any) => o.status !== 'CANCELLED')
@@ -237,8 +248,11 @@ export const getDashboardStats = async (req: Request, res: Response) => {
     const preparingCount = todayOrders.filter((o: any) => o.status === 'PREPARING').length;
     const readyCount = todayOrders.filter((o: any) => o.status === 'READY').length;
 
-    const totalTables = await prisma.table.count();
-    const occupiedTables = await prisma.table.count({ where: { isOccupied: true } });
+    const tableWhere: any = {};
+    if (reqRestaurantId) tableWhere.restaurantId = reqRestaurantId;
+
+    const totalTables = await prisma.table.count({ where: tableWhere });
+    const occupiedTables = await prisma.table.count({ where: { ...tableWhere, isOccupied: true } });
 
     return res.json({
       success: true,
@@ -259,7 +273,8 @@ export const getDashboardStats = async (req: Request, res: Response) => {
 
 export const getBusinessAnalytics = async (req: Request, res: Response) => {
   try {
-    const { period = 'THIS_MONTH', startDate, endDate } = req.query;
+    const { period = 'THIS_MONTH', startDate, endDate, restaurantId } = req.query;
+    const reqRestaurantId = (req as AuthenticatedRequest).user?.restaurantId || (restaurantId as string);
 
     const now = new Date();
     let start: Date;
@@ -283,13 +298,18 @@ export const getBusinessAnalytics = async (req: Request, res: Response) => {
       start = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
     }
 
-    const orders = await prisma.order.findMany({
-      where: {
-        createdAt: {
-          gte: start,
-          lte: end,
-        },
+    const where: any = {
+      createdAt: {
+        gte: start,
+        lte: end,
       },
+    };
+    if (reqRestaurantId) {
+      where.restaurantId = reqRestaurantId;
+    }
+
+    const orders = await prisma.order.findMany({
+      where,
       include: {
         items: {
           include: {

@@ -37,10 +37,11 @@ export const CustomerMenuPage: React.FC = () => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
+        const restIdParam = searchParams.get('restaurantId') || undefined;
         const [resRest, resCats, resMenu] = await Promise.all([
-          api.getRestaurant(),
-          api.getCategories(),
-          api.getMenuItems({ availableOnly: false }),
+          api.getRestaurant(restIdParam),
+          api.getCategories(restIdParam),
+          api.getMenuItems({ availableOnly: false, restaurantId: restIdParam }),
         ]);
 
         if (resRest.success) setRestaurant(resRest.restaurant);
@@ -53,7 +54,7 @@ export const CustomerMenuPage: React.FC = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [searchParams]);
 
   // 3. Filtered Menu Calculation
   const filteredItems = menuItems.filter((item) => {

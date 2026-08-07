@@ -1,9 +1,19 @@
 import { Request, Response } from 'express';
 import { prisma } from '../config/db.js';
+import { AuthenticatedRequest } from '../middleware/auth.js';
 
 export const getRestaurant = async (req: Request, res: Response) => {
   try {
-    let restaurant = await prisma.restaurant.findFirst();
+    const { restaurantId } = req.query;
+
+    let restaurant;
+    if (restaurantId && typeof restaurantId === 'string') {
+      restaurant = await prisma.restaurant.findUnique({ where: { id: restaurantId } });
+    }
+
+    if (!restaurant) {
+      restaurant = await prisma.restaurant.findFirst();
+    }
 
     if (!restaurant) {
       restaurant = await prisma.restaurant.create({
@@ -14,7 +24,7 @@ export const getRestaurant = async (req: Request, res: Response) => {
           phone: '+1 (555) 234-5678',
           email: 'info@gourmethaven.com',
           address: '123 Culinary St, Foodville',
-          currency: '$',
+          currency: 'Nu ',
           tableCount: 12,
         },
       });
@@ -26,11 +36,18 @@ export const getRestaurant = async (req: Request, res: Response) => {
   }
 };
 
-export const updateRestaurant = async (req: Request, res: Response) => {
+export const updateRestaurant = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { name, tagline, openingHours, phone, email, address, currency, tableCount } = req.body;
+    const adminRestaurantId = req.user?.restaurantId;
 
-    let restaurant = await prisma.restaurant.findFirst();
+    let restaurant;
+    if (adminRestaurantId) {
+      restaurant = await prisma.restaurant.findUnique({ where: { id: adminRestaurantId } });
+    }
+    if (!restaurant) {
+      restaurant = await prisma.restaurant.findFirst();
+    }
 
     if (!restaurant) {
       restaurant = await prisma.restaurant.create({
@@ -41,7 +58,7 @@ export const updateRestaurant = async (req: Request, res: Response) => {
           phone: phone || '',
           email: email || '',
           address: address || '',
-          currency: currency || '$',
+          currency: currency || 'Nu ',
           tableCount: tableCount ? parseInt(tableCount) : 12,
         },
       });
@@ -62,12 +79,12 @@ export const updateRestaurant = async (req: Request, res: Response) => {
         },
       });
 
-      // Synchronize tables in DB if tableCount increased
-      const currentTablesCount = await prisma.table.count();
+      // Synchronize tables for this restaurant if tableCount increased
+      const currentTablesCount = await prisma.table.count({ where: { restaurantId: restaurant.id } });
       if (newTableCount > currentTablesCount) {
         for (let i = currentTablesCount + 1; i <= newTableCount; i++) {
           await prisma.table.create({
-            data: { number: i, isOccupied: false },
+            data: { number: i, isOccupied: false, restaurantId: restaurant.id },
           });
         }
       }

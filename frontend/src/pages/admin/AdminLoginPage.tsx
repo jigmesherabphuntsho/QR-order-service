@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { UtensilsCrossed, Lock, Mail, ArrowRight, Loader2, Sparkles } from 'lucide-react';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
@@ -111,6 +111,13 @@ export const AdminLoginPage: React.FC = () => {
             )}
           </button>
         </form>
+
+        <div className="text-center text-xs text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800">
+          Want to register a new restaurant?{' '}
+          <Link to="/admin/register" className="font-bold text-brand-500 hover:text-brand-600 underline">
+            Register Your Restaurant
+          </Link>
+        </div>
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import QRCode from 'qrcode';
 import { prisma } from '../config/db.js';
+import { AuthenticatedRequest } from '../middleware/auth.js';
 
 const getClientUrl = (req: Request): string => {
   const queryBaseUrl = req.query.baseUrl as string;
@@ -26,24 +27,43 @@ const getClientUrl = (req: Request): string => {
 export const getTables = async (req: Request, res: Response) => {
   try {
     const clientUrl = getClientUrl(req);
+    const reqRestaurantId = (req as AuthenticatedRequest).user?.restaurantId || (req.query.restaurantId as string);
+
+    const where: any = {};
+    if (reqRestaurantId) {
+      where.restaurantId = reqRestaurantId;
+    }
+
     let tables = await prisma.table.findMany({
+      where,
       orderBy: { number: 'asc' },
     });
 
     if (tables.length === 0) {
-      // Ensure default tables exist
-      const restaurant = await prisma.restaurant.findFirst();
-      const count = restaurant ? restaurant.tableCount : 12;
-      for (let i = 1; i <= count; i++) {
-        await prisma.table.create({ data: { number: i, isOccupied: false } });
+      let restaurant;
+      if (reqRestaurantId) {
+        restaurant = await prisma.restaurant.findUnique({ where: { id: reqRestaurantId } });
       }
-      tables = await prisma.table.findMany({ orderBy: { number: 'asc' } });
+      if (!restaurant) {
+        restaurant = await prisma.restaurant.findFirst();
+      }
+
+      const count = restaurant ? restaurant.tableCount : 6;
+      for (let i = 1; i <= count; i++) {
+        await prisma.table.create({
+          data: { number: i, isOccupied: false, restaurantId: restaurant?.id || null },
+        });
+      }
+      tables = await prisma.table.findMany({
+        where,
+        orderBy: { number: 'asc' },
+      });
     }
 
-    // Attach dynamic QR Data URL to each table object
     const tablesWithQR = await Promise.all(
       tables.map(async (t: any) => {
-        const qrContent = `${clientUrl}/menu?table=${t.number}`;
+        const restParam = t.restaurantId ? `&restaurantId=${t.restaurantId}` : '';
+        const qrContent = `${clientUrl}/menu?table=${t.number}${restParam}`;
         const dataUrl = await QRCode.toDataURL(qrContent, {
           width: 300,
           margin: 2,
@@ -54,7 +74,7 @@ export const getTables = async (req: Request, res: Response) => {
         });
         return {
           ...t,
-          qrUrl: `${clientUrl}/menu?table=${t.number}`,
+          qrUrl: qrContent,
           qrDataUrl: dataUrl,
         };
       })
@@ -71,12 +91,14 @@ export const generateTableQR = async (req: Request, res: Response) => {
     const { tableNumber } = req.params;
     const clientUrl = getClientUrl(req);
     const num = parseInt(tableNumber, 10);
+    const reqRestaurantId = (req as AuthenticatedRequest).user?.restaurantId || (req.query.restaurantId as string);
 
     if (isNaN(num) || num <= 0) {
       return res.status(400).json({ success: false, message: 'Invalid table number' });
     }
 
-    const qrContent = `${clientUrl}/menu?table=${num}`;
+    const restParam = reqRestaurantId ? `&restaurantId=${reqRestaurantId}` : '';
+    const qrContent = `${clientUrl}/menu?table=${num}${restParam}`;
 
     const dataUrl = await QRCode.toDataURL(qrContent, {
       width: 400,
@@ -102,14 +124,17 @@ export const createTable = async (req: Request, res: Response) => {
   try {
     const { number } = req.body;
     const tableNumber = parseInt(number, 10);
+    const reqRestaurantId = (req as AuthenticatedRequest).user?.restaurantId;
 
     if (isNaN(tableNumber) || tableNumber <= 0) {
       return res.status(400).json({ success: false, message: 'Please provide a valid table number greater than 0' });
     }
 
-    // Check if table already exists
-    const existing = await prisma.table.findUnique({
-      where: { number: tableNumber },
+    const whereCheck: any = { number: tableNumber };
+    if (reqRestaurantId) whereCheck.restaurantId = reqRestaurantId;
+
+    const existing = await prisma.table.findFirst({
+      where: whereCheck,
     });
 
     if (existing) {
@@ -120,20 +145,13 @@ export const createTable = async (req: Request, res: Response) => {
       data: {
         number: tableNumber,
         isOccupied: false,
+        restaurantId: reqRestaurantId || null,
       },
     });
 
-    // Update restaurant tableCount if larger
-    const restaurant = await prisma.restaurant.findFirst();
-    if (restaurant && tableNumber > restaurant.tableCount) {
-      await prisma.restaurant.update({
-        where: { id: restaurant.id },
-        data: { tableCount: tableNumber },
-      });
-    }
-
     const clientUrl = getClientUrl(req);
-    const qrContent = `${clientUrl}/menu?table=${newTable.number}`;
+    const restParam = reqRestaurantId ? `&restaurantId=${reqRestaurantId}` : '';
+    const qrContent = `${clientUrl}/menu?table=${newTable.number}${restParam}`;
     const dataUrl = await QRCode.toDataURL(qrContent, {
       width: 300,
       margin: 2,
@@ -181,4 +199,3 @@ export const deleteTable = async (req: Request, res: Response) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
-

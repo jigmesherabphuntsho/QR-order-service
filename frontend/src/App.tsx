@@ -14,6 +14,7 @@ import { CustomerMenuPage } from './pages/CustomerMenuPage';
 import { OrderSuccessPage } from './pages/OrderSuccessPage';
 import { TrackOrderPage } from './pages/TrackOrderPage';
 import { AdminLoginPage } from './pages/admin/AdminLoginPage';
+import { AdminRegisterPage } from './pages/admin/AdminRegisterPage';
 import { AdminDashboardPage } from './pages/admin/AdminDashboardPage';
 import { AdminAnalyticsPage } from './pages/admin/AdminAnalyticsPage';
 import { AdminOrdersPage } from './pages/admin/AdminOrdersPage';
@@ -68,6 +69,7 @@ export const AppContent: React.FC = () => {
 
           {/* Admin Routes */}
           <Route path="/admin/login" element={<AdminLoginPage />} />
+          <Route path="/admin/register" element={<AdminRegisterPage />} />
           
           <Route
             path="/admin/dashboard"
