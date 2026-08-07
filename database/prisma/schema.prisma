@@ -5,7 +5,6 @@ datasource db {
 
 generator client {
   provider      = "prisma-client-js"
-  output        = "../../backend/node_modules/.prisma/client"
   binaryTargets = ["native", "rhel-openssl-1.0.x", "rhel-openssl-3.0.x", "debian-openssl-1.1.x", "debian-openssl-3.0.x"]
 }
 
@@ -13,7 +12,6 @@ model Restaurant {
   id           String     @id @default(uuid())
   name         String     @default("Gourmet Haven")
   tagline      String     @default("Authentic Flavors & Fresh Ingredients")
-  slug         String     @default("gourmet-haven")
   openingHours String     @default("10:00 AM - 10:00 PM")
   phone        String     @default("+1 (555) 234-5678")
   email        String     @default("info@gourmethaven.com")
