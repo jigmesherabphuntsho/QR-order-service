@@ -34,13 +34,11 @@ export const registerAdmin = async (req: Request, res: Response) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const slug = restaurantName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
 
     // Create Restaurant record
     const restaurant = await prisma.restaurant.create({
       data: {
         name: restaurantName,
-        slug: slug || undefined,
         tagline: tagline || 'Authentic Flavors & Fresh Ingredients',
         phone: phone || '+1 (555) 000-0000',
         email: email,
